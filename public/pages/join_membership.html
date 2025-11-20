@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>for call phobia - 회원가입</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header-box">
+            <h1><a href="index.html">for call phobia</a></h1>
+        </div>
+        <h2 class="second-title">for call phobia</h2>
+        <form class="login-form" action="/login" method="POST">
+            <div class="login-input-group">
+                <input type="text" id="username" name="username" required>
+                <label class="join-membership-label" for="username">아이디를 입력하세요</label>
+                <div class="join-membership-caution">대소문자 영어, 숫자만 입력 가능</div>
+            </div>
+            
+            <div class="login-input-group">
+                <input type="password" id="password" name="password" required>
+                <label class="join-membership-label" for="password">비밀번호를 입력하세요</label>
+                <div class="join-membership-caution">대소문자 영어, 숫자, 특수기호(!, @, ^, *) 포함 8글자 이상</div>
+            </div>
+
+            <button class="login-button">회원가입</button>
+        </form>
+        <div class="footer">
+            <p><a href="terms_of_service_and_privacy_policy.html">약관 | 개인정보 처리 방침</a></p>
+        </div>
+    </div>
+    
+</body>
+</html>

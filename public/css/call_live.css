@@ -1,0 +1,130 @@
+/* 기본 스타일 설정 */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #F3F4F6 !important;
+    color: #333;
+    height: 100%; /* 전체 페이지 높이 설정 */
+}
+
+
+.call-container {
+    width: 100%;      /* 전체 화면 너비 차지 */
+    height: 100vh;    /* 전체 화면 높이 차지 */
+    margin: 0 auto;   /* 가운데 정렬 */
+    background-color: #F3F4F6;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+    display: flex;
+    height: 40px;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #111827;
+    padding: 5px;
+    border-radius: 0px;
+}
+
+.second-title {
+    font-size: 30px;
+    margin-left: 290px;
+}
+
+.call-info {
+    display: flex;
+    align-items: center;
+    color: white;
+}
+
+.call-info .call-icon {
+    font-size: 24px;
+    margin-right: 10px;
+    margin-left: 10px;
+}
+
+.call-info .phone-number {
+    font-size: 25px;
+}
+
+.end-call {
+    width: 150px;
+    background-color: red;
+    color: white;
+    font-size: 20px;
+    border: none;
+    padding: 3.5px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.end-call:hover {
+    background-color: darkred;
+}
+
+.chat-window {
+    margin-top: 20px;
+    height: 500px;
+    overflow-y: scroll;
+    padding: 10px;
+    background-color: #F3F4F6
+    /* border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fafafa; */
+}
+
+.message {
+    margin-bottom: 15px;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.message.received {
+    background-color: #e0f7fa;
+    text-align: left;
+}
+
+.message.typing {
+    background-color: #f1f1f1;
+    text-align: left;
+    font-style: italic;
+}
+
+.chat-input {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+    position: fixed;
+    bottom: 30px; /* 페이지 하단에서 20px 띄우기 */
+    left: 50%;
+    transform: translateX(-50%); /* 가로로 중앙 정렬 */
+    width: 100%; /* 화면 너비의 90% */
+    margin-top: 30px; /* 위쪽 간격 추가 */
+}
+
+.chat-input input {
+    width: 900px;
+    margin-left: 100px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 25px;
+}
+
+.chat-input .send-button {
+    width: 170px;
+    background-color: #4F46E5;
+    color: white;
+    border: none;
+    padding: 6px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 30px;
+    margin-right: 50px;
+}
+
+.chat-input .send-button:hover {
+    background-color: #3a36b5;
+}

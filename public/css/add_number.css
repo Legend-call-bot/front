@@ -1,0 +1,186 @@
+/* 기본 스타일 설정 */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #ffffff;
+    color: #333;
+}
+
+.container {
+    width: 100%;
+    max-width: 100%; /* 화면 너비에 딱 맞춤 */
+    margin: 0 auto;
+    padding: 0;
+    /* overflow-x: hidden;  ✅ 가로 스크롤 완전히 차단 */
+}
+
+/* 헤더 스타일 */
+
+.header-box {
+            display: flex;
+            width: 100%;
+            height: 50px;
+            background-color: #4F46E5; /* 배경을 흰색으로 설정 */
+            border: 1px solid #4F46E5; /* 파란색 테두리 */
+            text-align: left;
+            padding: 0px;
+            padding-left: 20px;
+            align-items: center;
+        }
+
+.header-box a {
+            text-decoration: none; /* 링크 밑줄 제거 */
+            color: black; /* 링크 텍스트 색상 */
+            font-size: 30px;
+        }
+
+.header-box h1 {
+    padding-top: 0px;
+    margin: 0;
+}
+
+.footer {
+    font-size: 13px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background: #fff;
+    text-align: center;
+    padding: 10px 0;
+    /* margin-top: 0;  <- 큰 마진들 제거 */
+    z-index: 10;
+}
+
+.container {
+  padding-bottom: 60px; /* 푸터 높이만큼 */
+}
+
+.second-title {
+    font-size: 47px;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 140px;
+    margin-bottom: 0px; /* 아래 여백으로 입력창과 간격 조정 */
+    color: #000; /* 필요하면 색상 변경 가능 */
+}
+
+input, textarea, button {
+    /* width: 100%; */
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.add-number-form {
+    margin-top: 80px;
+}
+
+.add-number-button {
+    width: 120px;
+    padding-top: 0px;
+    padding-bottom: 2px;
+    /* text-align: center; */
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    color: black;
+    background-color: #fff;
+    cursor: pointer;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+
+    display: block;
+}
+
+.label-font {
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 30px;
+    margin-bottom: 0px;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+
+.input-name-number {
+    width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    font-size: 20px;
+    font-weight: bold;
+    padding-left: 15px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+/* .input-memo {
+    width: 300px;
+    height: 100px;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+} */
+
+.input-name-number-label {
+    width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    font-size: 19px;
+    font-weight: bold;
+    position: relative; /* 절대 위치 제거, relative로 수정 */
+    color: black;
+    padding-left: 15px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    /* left: 1px;
+    top: 45%;                세로 중앙 정렬
+    transform: translateY(-50%);
+    pointer-events: none;
+    transition: 0.2s ease all; */
+}
+
+.input-memo-label {
+    width: 300px;
+    height: 100px;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    font-size: 19px;
+    font-weight: bold;
+    position: relative; /* 절대 위치 제거, relative로 수정 */
+    color: black;
+    padding-left: 15px;
+    padding-top: 5px;
+    font-family: Arial, sans-serif;
+}
+
+.finished {
+    width: 100px;
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 30px;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    padding-top: 2px;
+    padding-bottom: 5px;
+    background-color: white; /* 배경 색상 추가 */
+    color: black; /* 텍스트 색상 설정 */
+    cursor: pointer; /* 클릭 가능한 커서로 변경 */
+    z-index: 10; /* 다른 요소 위에 표시되도록 설정 */
+}
+
+.finished:hover {
+    background-color: #ddd; /* 호버 시 배경 색상 변경 */
+}
