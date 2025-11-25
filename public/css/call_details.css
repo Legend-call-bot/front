@@ -1,0 +1,106 @@
+/* ===== 통화 상세 페이지 ===== */
+
+/* 페이지 배경 */
+.call-details-body {
+    background-color: #f3f4f6;
+}
+
+/* style.css에서 .call-details 가 text-align: center라서 덮어쓰기 */
+.call-details {
+    max-width: 1000px;
+    margin: 56px auto 60px;
+    padding: 0 24px;
+    box-sizing: border-box;
+    text-align: left;
+}
+
+/* 제목 + 메타 정보 */
+.call-header {
+    margin-bottom: 24px;
+}
+
+/* 제목 */
+.call-title {
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+}
+
+/* 날짜/시간 */
+.call-meta {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 400;
+    color: #555;
+}
+
+/* 통화 요약 카드 */
+.call-summary {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: 12px;
+    background-color: #ffffff;
+    border-radius: 14px;
+    padding: 14px 18px 4px;
+    margin-bottom: 69px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    max-width: 640px;
+}
+
+/* 요약 텍스트 영역 */
+.summary-text-wrap {
+    display: flex;
+    flex-direction: column;
+}
+
+/* 통화 요약 제목 */
+.summary-label {
+    font-size: 22px;
+    font-weight: 400;
+}
+
+/* 통화 요약 내용 */
+.summary-text {
+    font-size: 22px;
+    font-weight: 400;
+    line-height: 0.8;
+}
+
+/* 대화 말풍선 영역 */
+.conversation {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* 말풍선 기본 */
+.bubble {
+    display: inline-block;
+    max-width: 60%;
+    padding: 10px 14px;
+    border-radius: 16px;
+    background-color: #ffffff;
+    font-size: 22px;
+    line-height: 1.5;
+    font-weight: 400;
+}
+
+/* 왼쪽 말풍선 */
+.bubble-left {
+    align-self: flex-start;
+}
+
+/* 오른쪽 말풍선 */
+.bubble-right {
+    align-self: flex-end;
+}
+
+/* ===== 폰트 크기 강제 지정 ===== */
+.call-details .call-meta {
+    font-size: 22px !important;
+}
+
+.call-summary .summary-text {
+    font-size: 22px !important;
+}
+

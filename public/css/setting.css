@@ -1,0 +1,238 @@
+/* ========== 설정 화면 ========== */
+
+/* 설정 페이지 전체 영역 */
+.setting {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 67px 16px 80px;
+    background-color: #ffffff;
+    color: #111;
+}
+
+/* 설정 카드 박스 */
+.settings-card {
+    width: 100%;
+    max-width: 434px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    border: 2px solid #6750a4;
+    border-radius: 40px;
+    padding: 32px 30px 24px;
+    box-sizing: border-box;
+}
+
+/* 제목 */
+.settings-title {
+    text-align: center;
+    font-size: 28px;
+    line-height: 1.3;
+    margin: 0 0 40px;
+    color: #111;
+    font-weight: 400;
+}
+
+/* 폼 */
+.settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.settings-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    font-size: 19px;
+    line-height: 1.3;
+    color: #111;
+}
+
+/* 체크박스 라벨 */
+.settings-checkline {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    font-size: 19px;
+    line-height: 1.3;
+}
+
+.settings-checkbox {
+    width: 18px;
+    height: 18px;
+    position: relative;
+    top: -9px;
+    accent-color: #6750a4;
+}
+
+/* 본문 (체크박스 아래 내용) */
+.settings-body {
+    margin-left: 32px;
+    width: calc(100% - 92px);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* 공통 컨트롤 스타일 */
+.settings-input,
+.settings-select,
+.preview-btn,
+.settings-submit-btn {
+    border: 1.5px solid rgba(166, 161, 247, 0.4);
+    border-radius: 12px;
+    background-color: #ffffff;
+    color: #111;
+    box-sizing: border-box;
+    font-size: 15px;
+    line-height: 1.4;
+}
+
+/* Twilio 번호 연결 확인 */
+.settings-form .settings-row:first-of-type {
+    gap: 0;
+}
+
+.settings-form .settings-row:first-of-type .settings-input {
+    width: 200px;
+    min-width: 0;
+}
+
+.settings-form .settings-row:first-of-type .settings-checkline {
+    align-items: center;
+    margin-bottom: 0;
+}
+
+.settings-form .settings-row:first-of-type .settings-checkbox {
+    top: 0;
+}
+
+.settings-form .settings-row:first-of-type .settings-body {
+    margin-top: 0;
+    gap: 0;
+}
+
+/* TTS 프리셋 행 */
+.settings-row-top {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+}
+
+.settings-row-top .preview-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    flex-grow: 0;
+    width: 100px;
+    height: 40px;
+    font-size: 16px;
+    padding: 0 6px;
+    border: 1.5px solid rgba(166, 161, 247, 0.4);
+    border-radius: 12px;
+    transform: translateX(84px);
+}
+
+.settings-row-top .settings-checkline {
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.settings-row-top .settings-label-text {
+    white-space: nowrap;
+    line-height: 1.2;
+}
+
+.settings-row-top .settings-checkbox {
+    top: 0;
+    width: 18px;
+    height: 18px;
+}
+
+/* select (목소리 / 속도 보통) */
+.settings-select {
+    appearance: none;
+    -webkit-appearance: none;
+    min-width: 200px;
+    height: 42px;
+    padding: 10px 14px;
+    font-size: 16px;
+    border: 1.5px solid rgba(166, 161, 247, 0.4);
+    border-radius: 12px;
+    background-color: #ffffff;
+    background-image: linear-gradient(45deg, transparent 50%, #6750a4 50%),
+        linear-gradient(135deg, #6750a4 50%, transparent 50%);
+    background-position: calc(100% - 20px) calc(50% - 3px),
+        calc(100% - 15px) calc(50% - 3px);
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
+    color: #111;
+}
+
+/* 라디오 그룹 */
+.radio-group {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    font-size: 16px;
+    line-height: 1.4;
+}
+
+.radio-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.radio-option input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    accent-color: #111;
+}
+
+/* 완료 버튼 */
+.settings-submit-btn {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 200px;
+    padding: 12px 24px;
+    margin: 12px auto 0;
+    font-size: 18px;
+    line-height: 1.2;
+    color: #111;
+    text-decoration: none;
+    background-color: #ffffff;
+    border: 1.5px solid #6750a4;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03);
+    cursor: pointer;
+}
+
+/* 기타 링크 */
+.logout-link,
+.policy-link {
+    color: #111;
+    text-decoration: none;
+}
+
+.policy-link {
+    font-size: 16px;
+    color: #444;
+}
+
+.logout-link:hover,
+.policy-link:hover {
+    text-decoration: underline;
+}
+
+.settings-input:hover,
+.settings-select:hover,
+.preview-btn:hover,
+.settings-submit-btn:hover {
+    border-color: #6750a4;
+}

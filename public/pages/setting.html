@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>for call phobia - 설정</title>
+        <link rel="stylesheet" href="../css/style.css" />
+        <link rel="stylesheet" href="../css/setting.css" />
+    </head>
+    <body>
+        <div class="container">
+            <!-- 상단 보라 헤더 영역 그대로 재사용 -->
+            <div class="header-box">
+                <h1><a href="call.html">for call phobia</a></h1>
+            </div>
+
+            <!-- 전체 설정 페이지 래퍼 -->
+            <main class="setting">
+                <!-- 가운데 카드 -->
+                <section class="settings-card">
+                    <!-- 카드 상단 타이틀 -->
+                    <h2 class="settings-title">설정</h2>
+
+                    <!-- 폼 영역 -->
+                    <form class="settings-form">
+                        <!-- 1. Twilio 번호 연결 확인 -->
+                        <div class="settings-row">
+                            <label class="settings-checkline">
+                                <input
+                                    type="checkbox"
+                                    class="settings-checkbox"
+                                />
+                                <span class="settings-label-text"
+                                    >Twilio 번호 연결 확인</span
+                                >
+                            </label>
+                            <div class="settings-body">
+                                <input
+                                    type="text"
+                                    class="settings-input"
+                                    value="+1 10 1234 5678"
+                                />
+                            </div>
+                        </div>
+
+                        <!-- 2. 녹음, 자막 저장 동의 -->
+                        <div class="settings-row">
+                            <label class="settings-checkline">
+                                <input
+                                    type="checkbox"
+                                    class="settings-checkbox"
+                                />
+                                <span class="settings-label-text">
+                                    녹음, 자막 저장 등의<br />
+                                    STT/TTS 처리·보관 약관
+                                </span>
+                            </label>
+                        </div>
+
+                        <!-- 3. TTS 프리셋 -->
+                        <div class="settings-row">
+                            <div class="settings-row-top">
+                                <label class="settings-checkline">
+                                    <input
+                                        type="checkbox"
+                                        class="settings-checkbox"
+                                    />
+                                    <span class="settings-label-text"
+                                        >TTS 프리셋</span
+                                    >
+                                </label>
+                                <button type="button" class="preview-btn">
+                                    미리듣기
+                                </button>
+                            </div>
+                            <div class="settings-body">
+                                <select class="settings-select">
+                                    <option>목소리</option>
+                                    <option>다른 목소리</option>
+                                </select>
+
+                                <select class="settings-select">
+                                    <option>속도 보통</option>
+                                    <option>조금 느리게</option>
+                                    <option>조금 빠르게</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- 4. 수신 기본 상태 -->
+                        <div class="settings-row">
+                            <label class="settings-checkline">
+                                <input
+                                    type="checkbox"
+                                    class="settings-checkbox"
+                                />
+                                <span class="settings-label-text">
+                                    수신 기본 상태<br />
+                                    로그인 시 기본값: 수신
+                                </span>
+                            </label>
+                            <div class="settings-body">
+                                <div class="radio-group">
+                                    <label class="radio-option">
+                                        <input
+                                            type="radio"
+                                            name="status"
+                                            value="on"
+                                            checked
+                                        />
+                                        <span class="radio-text">ON</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input
+                                            type="radio"
+                                            name="status"
+                                            value="off"
+                                        />
+                                        <span class="radio-text">OFF</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 완료 버튼 -->
+                        <button type="submit" class="settings-submit-btn">
+                            완료
+                        </button>
+                    </form>
+                </section>
+            </main>
+
+            <!-- 고정 하단 푸터 -->
+            <div class="footer">
+                <a
+                    href="terms_of_service_and_privacy_policy.html"
+                    class="legal-link"
+                    >약관 | 개인정보처리방침</a
+                >
+            </div>
+        </div>
+    </body>
+</html>

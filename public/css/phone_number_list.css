@@ -1,0 +1,240 @@
+/* ====== 전화번호부 ====== */
+
+/* 전체 래퍼 */
+.pn-wrap {
+    padding: 103px 40px 100px;
+    display: flex;
+    justify-content: center;
+    background: #ffffff;
+}
+
+.pn-card {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    align-items: flex-start;
+    position: relative;
+}
+
+/* 카드 가운데 세로선 */
+.pn-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: -40px;
+    left: 50%;
+    width: 1px;
+    background: #707070;
+    transform: translateX(-0.5px);
+}
+
+/* 좌/우 영역 */
+.pn-left,
+.pn-right {
+    flex: 1; /* 기본 1:1 비율 */
+}
+
+.pn-left {
+    padding-right: 60px;
+}
+
+.pn-right {
+    padding-left: 180px;
+    border-left: none;
+}
+
+/* ====== 왼쪽 : 전화번호부 ====== */
+
+.pn-header-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    max-width: 540px;
+}
+
+.pn-title-block {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.pn-title {
+    font-size: 40px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0;
+}
+
+.pn-subtitle {
+    font-size: 24px;
+    font-weight: 400;
+    color: #333333;
+    margin: 0;
+}
+
+/* 오른쪽의 + 버튼 */
+.pn-add-btn {
+    width: 48px !important;
+    height: 48px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 999px !important;
+    border: none !important;
+    background: transparent !important;
+    color: #000000 !important;
+    font-size: 50px !important;
+    font-weight: 400 !important;
+    line-height: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+
+    position: relative;
+    left: 40px;
+    top: 6px;
+}
+
+/* 검색 박스 */
+.pn-search-box {
+    margin-top: 28px;
+    margin-bottom: 32px;
+    max-width: 420px;
+    position: relative;
+}
+
+/* style.css의 input 공통 스타일 덮어쓰기 */
+.pn-search-box input[type="text"] {
+    width: 100%;
+    padding: 14px 44px 14px 20px;
+    margin: 0;
+    border-radius: 999px;
+    border: 2px solid #4f46e5;
+    font-size: 24px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.pn-search-box input[type="text"]::placeholder {
+    color: #999;
+}
+
+/* 돋보기 아이콘 */
+.pn-search-icon {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    pointer-events: none;
+}
+
+/* 좌측 리스트 제목 */
+.pn-section-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0 0 16px;
+}
+
+/* 리스트 공통 */
+.pn-list {
+    display: flex;
+    flex-direction: column;
+    gap: 27px;
+}
+
+/* 왼쪽 리스트 폭 제한 */
+.pn-left .pn-list {
+    max-width: 420px;
+}
+
+/* 한 행 */
+.pn-item {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+/* 왼쪽 아이콘 + 이름 */
+.pn-item-main {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex: 1;
+}
+
+.pn-item-icon {
+    width: 30px;
+    height: 30px;
+    display: block;
+    object-fit: contain;
+}
+
+/* 연락처 이름들(식당, 헤어샵, …) */
+.pn-name {
+    font-size: 28px;
+    font-weight: 580;
+    letter-spacing: -0.02em;
+}
+
+/* 즐겨찾기(병원/국제전화) 텍스트 굵게 */
+.pn-item--favorite .pn-name {
+    font-weight: 700;
+}
+
+/* 우측 액션 아이콘 영역 */
+.pn-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+/* 공통 아이콘 버튼 (전화 / 별) */
+.pn-icon-btn {
+    width: 40px !important;
+    height: 40px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 999px !important;
+    border: none !important;
+    background: transparent !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    color: #000000;
+}
+
+.pn-icon-btn img {
+    width: 30px;
+    height: 30px;
+    display: block;
+    object-fit: contain;
+    pointer-events: none;
+}
+
+/* ====== 오른쪽 : 즐겨찾기 ====== */
+
+/* 즐겨찾기 제목을 전화번호부와 동일하게 40px */
+.pn-right .pn-section-title {
+    font-size: 40px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 0 0 40px;
+}
+
+/* 오른쪽 리스트 */
+.pn-right .pn-list {
+    gap: 27px;
+    max-width: 360px;
+}
+
+.pn-right .pn-item-main {
+    flex: 0 0 370px;
+}
+
+.pn-icon-btn--star.is-active .pn-icon-svg path {
+    stroke: #000000;
+    fill: #4f46e5;
+}

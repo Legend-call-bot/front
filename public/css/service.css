@@ -1,0 +1,148 @@
+/* ========== 제공 서비스 | 도움말 ========== */
+.service {
+    padding-top: 64px;
+}
+.service .sections {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 32px;
+}
+.service .section {
+    flex: 0 1 520px;
+    min-width: 320px;
+    max-width: 560px;
+}
+
+.service .section + .section {
+    border-left: 1px solid #000000;
+    padding-left: 60px;
+}
+
+/* 타이포 */
+.service .section h2 {
+    text-align: center;
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0 0 12px;
+}
+.service .section:first-child h2,
+.service .section:last-child h2 {
+    margin-bottom: 58px;
+}
+
+/* 리스트 공통 */
+.service .section ul {
+    list-style: none;
+    margin: 0;
+    padding-left: 0;
+    margin-inline: auto;
+}
+
+/* 아이콘 + 텍스트 레이아웃으로 변경 */
+.service .section li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+
+    color: #000000;
+    line-height: 1.4;
+    font-size: 24px;
+    font-weight: 600;
+
+    overflow-wrap: anywhere;
+    word-break: keep-all;
+}
+
+/* 항목 간 간격 */
+.service .section li + li {
+    margin-top: 26px;
+}
+
+/* 인라인 SVG 핀 아이콘 전용 래퍼 */
+.service .section .service-pin {
+    flex: 0 0 auto;
+    margin-top: 0.15em; /* 텍스트와 수직 정렬 맞추기 */
+}
+
+/* 핀 SVG 크기 */
+.service .section .service-pin svg {
+    width: 18px;
+    height: 18px;
+    display: block;
+}
+
+/* 기존 최대 폭 설정 유지 */
+.section--service ul {
+    max-width: 44ch;
+}
+.section--help ul {
+    max-width: 56ch;
+}
+
+.section--service {
+    padding-right: 12px;
+}
+
+/* 버튼, 푸터 등 나머지는 그대로 */
+.service .service-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+
+    padding: 14px 32px;
+    min-width: 180px;
+    width: fit-content;
+    margin: 47px auto 0;
+
+    line-height: 1.2;
+    font-size: 32px;
+    font-weight: 600;
+    color: #111;
+    text-decoration: none;
+
+    background-color: #fff;
+    border: 1px solid #d7d7d7;
+    border-radius: 10px;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03);
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease,
+        transform 0.05s ease;
+}
+
+.service .service-btn:hover {
+    background-color: #f8f8f8;
+    border-color: #cfcfcf;
+}
+.service .service-btn:focus {
+    outline: 2px solid #e9e9e9;
+    outline-offset: 2px;
+}
+.service .service-btn:active {
+    transform: translateY(1px);
+}
+
+.service .legal-links {
+    margin: 30px auto 48px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+
+    font-size: 16px;
+    line-height: 1.4;
+    color: #000000;
+}
+
+.service .legal-links .legal-link {
+    color: #000000;
+    text-decoration: none;
+}
+
+.service .legal-links .legal-link:hover {
+    text-decoration: underline;
+    color: #555;
+}

@@ -1,0 +1,154 @@
+/* ====== 통화 내역 ====== */
+.ch-wrap {
+    padding: 28px 16px 80px;
+    display: flex;
+    justify-content: center;
+    background: #ffffff;
+}
+
+.ch-card {
+    width: 100%;
+    max-width: 1200px;
+}
+
+.ch-title {
+    margin: 18px 0 29px;
+    font-size: 40px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.ch-section-title {
+    margin: 14px 0 10px;
+    font-size: 20.8px;
+    font-weight: 700;
+    color: #000000;
+}
+
+.ch-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* 하나의 블록(제목+박스)와 다음 블록 사이 간격 늘리기 */
+.ch-list + .ch-section-title {
+    margin-top: 36px;
+}
+
+.ch-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+}
+
+/* ====== 각 통화 행 ====== */
+/* [아이콘 | 발신자 | 요약 | 시간 | 전화버튼 ] */
+.ch-item {
+    background: #fff;
+    border: 1px solid #e6e6ea;
+    border-radius: 40px;
+    padding: 16px 24px;
+    display: grid;
+    grid-template-columns:
+        minmax(60px, 80px)
+        minmax(220px, 260px)
+        minmax(0, 1fr)
+        minmax(30px, 40px)
+        minmax(30px, 50px);
+    align-items: center;
+    column-gap: 12px;
+
+    flex: 1;
+    min-width: 0; /* ← 요약 칸에서 말줄임(...) */
+}
+
+/* ====== 왼쪽 전화 아이콘 ====== */
+.ch-ic {
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+}
+
+.ch-ic img,
+.ch-ic svg {
+    width: 24px;
+    height: 24px;
+    display: block;
+    object-fit: contain;
+}
+
+/* ====== 발신자 정보 ====== */
+.ch-caller {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-left: 0px; /* 60 */
+}
+.ch-number {
+    font-size: 20.8px;
+    font-weight: 400;
+    word-break: break-all;
+}
+.ch-label {
+    font-size: 20.8px;
+    color: #000000;
+}
+
+/* ====== 요약 (가운데 열) ====== */
+.ch-summary {
+    font-size: 20.8px;
+    color: #222;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-left: 0px; /* 60 */
+}
+
+/* ====== 시간 ====== */
+.ch-time {
+    font-size: 20.8px;
+    color: #222;
+    justify-self: end;
+    margin-right: 116px;
+}
+
+/* ====== 동그란 아이콘 버튼 ====== */
+.icon-btn {
+    width: 48px !important;
+    height: 48px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #fff !important;
+    color: inherit !important;
+    border: 1px solid #d9d9e0 !important;
+    border-radius: 999px !important;
+    display: grid !important;
+    place-items: center !important;
+    cursor: pointer !important;
+    box-sizing: border-box !important;
+}
+.icon-btn:hover {
+    background: #f7f7fb !important;
+}
+.icon-btn img {
+    width: 22px;
+    height: 22px;
+    display: block;
+    object-fit: contain;
+    pointer-events: none;
+}
+
+/* 전화 버튼 */
+.icon-btn--call {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* 추가 버튼 살짝 그림자 */
+.icon-btn--add {
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+}
