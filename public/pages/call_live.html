@@ -14,17 +14,28 @@
                 <span class="phone-number">+82 10-1234-1234</span>
                 <span class="second-title">for call phobia</span>
             </div>
+            <button class="call-audio"><span class="audio-icon">🔊</span>오디오 시작</button>
             <button class="end-call">통화 종료</button>
         </div>
                 <!-- 실시간 통화 및 채팅창 -->
         <div class="chat-window" id="chat-window">
             <!-- 새로운 메시지는 이 곳에 동적으로 추가됩니다 -->
         </div>
+
+        <div class="ai-suggestions">
+        <div class="AI-recommended-answer fixed">다시 한 번 말씀해 주시겠어요?</div>
+        <div class="AI-recommended-answer dynamic">잠시만 기다려 주세요.</div>
+        <div class="AI-recommended-answer dynamic">다음에 다시 연락드리겠습니다.</div>
+        <div class="AI-recommended-answer dynamic">네, 그렇게 진행해 주세요.</div>
+        </div>
+
         <div class="chat-input">
             <input type="text" id="input-text" placeholder="상대에게 보낼 텍스트를 입력하세요." />
             <button class="send-button" id="send-button">보내기</button>
         </div>
         </div>
     </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="../javascript/call_live.js"></script>
 </body>
 </html>
