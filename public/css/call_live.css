@@ -45,6 +45,12 @@ body {
     margin-left: 10px;
 }
 
+.call-audio .audio-icon {
+    font-size: 24px;
+    margin-right:5px;
+    margin-left: 0px;
+}
+
 .call-info .phone-number {
     font-size: 25px;
 }
@@ -62,6 +68,25 @@ body {
 
 .end-call:hover {
     background-color: darkred;
+}
+
+.call-audio {
+    width: 190px;
+    background-color: #00DD00;
+    color: black;
+    font-size: 20px;
+    border: none;
+    padding-top: 1.5px;
+    padding-bottom: 3.5px;
+    padding-left: 15px;
+    padding-right: 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-right: -150px;
+}
+
+.call-audio:hover {
+    background-color: green;
 }
 
 .chat-window {
@@ -90,6 +115,48 @@ body {
     background-color: #f1f1f1;
     text-align: left;
     font-style: italic;
+}
+
+.ai-suggestions {
+    position: fixed;
+    bottom: 110px;              /* chat-input 위에 오도록 위치 조정 */
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 12px;                  /* 상자들 사이 간격 */
+    justify-content: center;
+    flex-wrap: wrap;   /* 줄바꿈 허용 */
+    width: 100%;
+    pointer-events: auto;       /* 클릭 가능하게 유지 */
+}
+
+.AI-recommended-answer {
+
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    padding: 10px 15px;
+    font-size: 23px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    cursor: pointer;
+    white-space: nowrap;        /* 한 줄 유지 (필요하면 지워도 됨) */
+}
+
+.AI-recommended-answer:hover {
+    background-color: #E5E7EB;  /* 살짝 회색 하이라이트 */
+}
+
+/* ⭐ 첫 번째 박스만 위 줄 + 가운데 정렬 */
+.fixed {
+    max-width: 380px;
+    margin-bottom: 8px;
+
+    margin-right: 100%;      /* → 아래 줄로 내려가게 만드는 핵심 */
+
+    position: relative;
+    left: 65%;
+    transform: translateX(-50%);
 }
 
 .chat-input {
