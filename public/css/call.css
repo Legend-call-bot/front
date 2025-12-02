@@ -64,7 +64,7 @@ body {
   font-size: 47px;
   font-weight: bold;
   text-align: center;
-  margin-top: 140px;
+  margin-top: 40px;
   margin-bottom: 0px; /* 아래 여백으로 입력창과 간격 조정 */
   color: #000; /* 필요하면 색상 변경 가능 */
 }
@@ -72,11 +72,29 @@ body {
 input,
 textarea,
 button {
+  font-family: Arial, sans-serif;
   width: 100%;
   padding: 12px;
   margin: 10px 0;
   border: 1px solid #ddd;
   border-radius: 4px;
+}
+
+/* 통화 목적 입력 박스 */
+.intent-box {
+  width: 280px; /* 전화번호 input과 동일한 폭 */
+  height: 100px; /* 목적을 적는 여유 공간 */
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+  padding: 10px;
+  font: Arial, sans-serif;
+  font-size: 18px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  resize: none; /* 크기 조절 비활성화 (디자인 유지) */
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .call-button {
@@ -91,6 +109,7 @@ button {
   padding-bottom: 7px;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 50px;
   display: block;
 }
 
