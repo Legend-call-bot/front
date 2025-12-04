@@ -115,7 +115,7 @@ body {
 
 .chat-window {
   margin-top: 20px;
-  height: 500px;
+  height: 400px;
   overflow-y: scroll;
   padding: 10px;
   background-color: #f3f4f6;
@@ -142,87 +142,60 @@ body {
 }
 
 .ai-suggestions {
-  position: fixed;
-  bottom: 110px; /* chat-input 위에 오도록 위치 조정 */
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 12px; /* 상자들 사이 간격 */
-  justify-content: center;
-  flex-wrap: wrap; /* 줄바꿈 허용 */
-  width: 100%;
-  pointer-events: auto; /* 클릭 가능하게 유지 */
-}
-
-.AI-recommended-answer {
-  background-color: white;
-  border: 1px solid #ddd;
-  border-radius: 20px;
-  padding: 10px 15px;
-  font-size: 23px;
-  text-align: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-  cursor: pointer;
-  white-space: nowrap; /* 한 줄 유지 (필요하면 지워도 됨) */
-}
-
-.AI-recommended-answer:hover {
-  background-color: #e5e7eb; /* 살짝 회색 하이라이트 */
-}
-
-/* ⭐ 첫 번째 박스만 위 줄 + 가운데 정렬 */
-.fixed {
-  max-width: 380px;
-  margin-bottom: 8px;
-
-  margin-right: 100%; /* → 아래 줄로 내려가게 만드는 핵심 */
-
-  position: relative;
-  left: 65%;
-  transform: translateX(-50%);
-}
-
-.ai-suggestions {
-    position: fixed;
-    bottom: 110px;              /* chat-input 위에 오도록 위치 조정 */
-    left: 50%;
-    transform: translateX(-50%);
+    position: relative;              /* Flexbox 레이아웃에서 위치를 설정 */
     display: flex;
-    gap: 12px;                  /* 상자들 사이 간격 */
-    justify-content: center;
-    flex-wrap: wrap;   /* 줄바꿈 허용 */
+    flex-direction: column;          /* 세로로 정렬 */
+    gap: 12px;                       /* 상자들 사이 간격 */
+    justify-content: flex-start;     /* 위쪽으로 정렬 */
     width: 100%;
-    pointer-events: auto;       /* 클릭 가능하게 유지 */
+    pointer-events: auto;            /* 클릭 가능하게 유지 */
+    height: auto;                    /* 높이를 자동으로 설정 */
+    top: 40px;                       /* 원하는 위치로 조정 (상단 간격 조정) */
 }
 
-.AI-recommended-answer {
+/* fixed 박스: 첫 번째 텍스트 박스 */
+.fixed {
+    max-width: 380px;
+    margin-bottom: 8px;
+    position: absolute;              /* 절대 위치 설정 */
+    left: 50%;
+    transform: translateX(-50%);     /* 화면 가운데 정렬 */
+    flex-shrink: 0;                  /* 고정된 크기 유지 */
+}
 
+/* dynamic-container: 추천 답변 박스들 */
+.dynamic-container {
+    display: flex;
+    flex-direction: row;             /* 가로로 정렬 */
+    gap: 12px;                       /* 간격 조정 */
+    justify-content: center;         /* 가운데 정렬 */
+    flex-wrap: wrap;                 /* 화면 크기에 맞춰 줄바꿈 */
+    width: 100%;                     /* 너비 100%로 설정 */
+    margin-top: 20px;                /* fixed 박스 아래로 여백 추가 */
+}
+
+/* AI-recommended-answer 박스: 길어질 경우 줄바꿈 */
+.AI-recommended-answer {
     background-color: white;
     border: 1px solid #ddd;
     border-radius: 20px;
     padding: 10px 15px;
     font-size: 23px;
     text-align: center;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
     cursor: pointer;
-    white-space: nowrap;        /* 한 줄 유지 (필요하면 지워도 됨) */
+    white-space: normal;             /* 한 줄이 아닌 여러 줄로 표시 */
+    word-wrap: break-word;           /* 긴 단어가 잘리지 않도록 줄바꿈 처리 */
+    min-width: 150px;                /* 최소 너비 설정 */
+    max-width: 300px;                /* 최대 너비 제한 */
+    flex-shrink: 0;                  /* 너비가 줄어들지 않도록 방지 */
+    flex-grow: 0;                    /* 크기 증가하지 않도록 방지 */
 }
 
 .AI-recommended-answer:hover {
-    background-color: #E5E7EB;  /* 살짝 회색 하이라이트 */
+    background-color: #E5E7EB;       /* 살짝 회색 하이라이트 */
 }
 
-/* ⭐ 첫 번째 박스만 위 줄 + 가운데 정렬 */
-.fixed {
-    max-width: 380px;
-    margin-bottom: 8px;
-
-    margin-right: 100%;      /* → 아래 줄로 내려가게 만드는 핵심 */
-
-    position: relative;
-    left: 65%;
-    transform: translateX(-50%);
-}
 
 .chat-input {
   display: flex;
