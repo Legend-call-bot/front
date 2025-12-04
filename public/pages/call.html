@@ -54,6 +54,18 @@
         </p>
       </div>
     </div>
+    <script>
+      // 전화번호부 버튼 클릭 시 전화번호 리스트 페이지로 이동
+      document
+        .querySelector('.phone-number-list-button')
+        .addEventListener('click', function () {
+          // call.html 이 /pages/call.html 이고,
+          // phone_number_list.html 도 /pages 안에 있다면:
+          window.location.href = 'phone_number_list.html';
+          // 만약 call.html이 루트(/call.html)에 있고, 리스트가 /pages/phone_number_list.html이면:
+          // window.location.href = 'pages/phone_number_list.html';
+        });
+    </script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="../javascript/call.js"></script>
   </body>
