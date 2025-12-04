@@ -260,3 +260,24 @@ body {
 .chat-input .send-button:hover {
   background-color: #3a36b5;
 }
+
+.chat-message {
+  margin-bottom: 15px;
+  padding: 10px 15px;
+  border-radius: 10px;
+  max-width: 70%;
+  font-size: 20px;
+}
+
+/* 직원(STT) — 왼쪽 */
+.chat-message.left {
+  background-color: #e0f7fa;
+  margin-right: auto;   /* 왼쪽 정렬 */
+}
+
+/* 나(TTS/텍스트 전송) — 오른쪽 */
+.chat-message.right {
+  background-color: #d1ffd6;
+  margin-left: auto;    /* 오른쪽 정렬 */
+  text-align: right;
+}

@@ -1,5 +1,5 @@
 // ⭐ 공통 서버 주소 (ngrok 주소)
-const SERVER_URL = "https://glancingly-gorsy-zana.ngrok-free.dev";
+const SERVER_URL = "https://unvolcanic-howard-unshapable.ngrok-free.dev";
 
 // ⭐ 저장용 전역 변수
 let globalPhone = null;

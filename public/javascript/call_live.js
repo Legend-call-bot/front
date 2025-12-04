@@ -26,7 +26,7 @@ if (phone && phoneDisplay) {
   phoneDisplay.textContent = formatKoreanPhone(phone);
 }
 // ===== 소켓 연결 =====
-const SERVER_URL = "https://glancingly-gorsy-zana.ngrok-free.dev";
+const SERVER_URL = "https://unvolcanic-howard-unshapable.ngrok-free.dev";
 
 const socket = io(SERVER_URL, {
   transports: ["polling"],
@@ -53,10 +53,15 @@ socket.on("stt.final", ({ text }) => {
 
 // ===== Gemini 추천 받기 =====
 socket.on("recommendations", ({ replies }) => {
+  const container = document.getElementById("dynamic-suggestions");
+
+  // 기존 추천 모두 삭제
+  container.innerHTML = "";
+
   replies.forEach((r) => {
-    const btn = document.createElement("button");
+    const btn = document.createElement("div");
     btn.innerText = r;
-    btn.className = "recommend-btn";
+    btn.className = "AI-recommended-answer dynamic";
 
     btn.onclick = () => {
       socket.emit("replySelected", {
@@ -64,13 +69,13 @@ socket.on("recommendations", ({ replies }) => {
         callSid: callSid,
       });
 
-      addMessage("AI 추천", r);
+      addMessage("나", r);  // 내가 보낸 메시지 → 오른쪽 정렬됨
     };
 
-    chatWindow.appendChild(btn);
-    scrollToBottom();
+    container.appendChild(btn);
   });
 });
+
 
 // ===== 통화 요약 =====
 socket.on("call.summary", ({ summary }) => {
@@ -96,14 +101,20 @@ endCallBtn.addEventListener("click", () => {
 // ===== 채팅 출력 함수 =====
 function addMessage(sender, text) {
   const msg = document.createElement("div");
-  msg.className = "chat-message";
+
+  // 직원(STT) = 왼쪽, 나(TTS) = 오른쪽
+  if (sender === "직원") {
+    msg.className = "chat-message left";
+  } else {
+    msg.className = "chat-message right";
+  }
 
   msg.innerHTML = `<b>${sender}:</b> ${text}`;
-
   chatWindow.appendChild(msg);
 
   scrollToBottom();
 }
+
 
 function scrollToBottom() {
   chatWindow.scrollTop = chatWindow.scrollHeight;
