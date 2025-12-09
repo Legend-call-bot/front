@@ -1,0 +1,16 @@
+# 환경변수
+.env
+
+# node_modules
+node_modules/
+
+# 로그 파일
+logs/
+*.log
+
+# 빌드 결과물
+dist/
+build/
+
+# 기타 비공개로 두고 싶은 폴더
+audio/
