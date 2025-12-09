@@ -418,10 +418,7 @@ ${historyText}
       while (replies.length < 3) {
         replies.push("알겠습니다.");
       }
-      // ✅ 항상 공통으로 "다시 한 번 말씀해 주시겠어요?" 추가
-      if (!replies.includes("다시 한 번 말씀해 주시겠어요?")) {
-        replies.push("다시 한 번 말씀해 주시겠어요?");
-      }
+
 
       // 중복 제거
       replies = [...new Set(replies)];

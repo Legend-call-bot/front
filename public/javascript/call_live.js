@@ -41,6 +41,22 @@ const inputText = document.getElementById("input-text");
 // ★★★ endCallBtn은 한 번만 선언해야 함 ★★★
 const endCallBtn = document.getElementById("endCallBtn");
 
+// 👉 고정된 "다시 한 번 말씀해 주시겠어요?" 박스
+const fixedSuggestion = document.querySelector(".AI-recommended-answer.fixed");
+if (fixedSuggestion) {
+  fixedSuggestion.addEventListener("click", () => {
+    const text = fixedSuggestion.innerText.trim();
+    if (!text) return;
+
+    socket.emit("replySelected", {
+      text,
+      callSid: callSid,   // 위에서 가져온 callSid 그대로 사용
+    });
+
+    addMessage("나", text);
+  });
+}
+
 // ===== 통화 bind =====
 socket.emit("bind.call", { callSid });
 console.log("✅ callSid 바인딩:", callSid);
@@ -57,6 +73,10 @@ socket.on("recommendations", ({ replies }) => {
 
   // 기존 추천 모두 삭제
   container.innerHTML = "";
+
+  const filtered = replies.filter(
+    (r) => r.trim() !== "다시 한 번 말씀해 주시겠어요?"
+  );
 
   replies.forEach((r) => {
     const btn = document.createElement("div");
@@ -75,10 +95,6 @@ socket.on("recommendations", ({ replies }) => {
     container.appendChild(btn);
   });
 });
-
-// 추천답변 내용 바뀔 때마다 이 함수 한번씩 호출해주면 됨
-// 예: 버튼을 새로 렌더링한 뒤
-// updateFixedPosition();
 
 
 // ===== 통화 요약 =====
