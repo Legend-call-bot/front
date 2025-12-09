@@ -115,7 +115,7 @@ body {
 
 .chat-window {
   margin-top: 20px;
-  height: 400px;
+  height: 350px;
   overflow-y: scroll;
   padding: 10px;
   background-color: #f3f4f6;
@@ -142,36 +142,49 @@ body {
 }
 
 .ai-suggestions {
-    position: relative;              /* Flexbox 레이아웃에서 위치를 설정 */
+    position: fixed;               /* 부모를 화면에 고정 */
+    bottom: 100px;                 /* 입력창(.chat-input bottom:30) 위로 띄우기 */
+    left: 50%;
+    transform: translateX(-50%);   /* 가운데 정렬 */
+
     display: flex;
-    flex-direction: column;          /* 세로로 정렬 */
-    gap: 12px;                       /* 상자들 사이 간격 */
-    justify-content: flex-start;     /* 위쪽으로 정렬 */
+    flex-direction: column;        /* 위: .fixed, 아래: .dynamic-container */
+    align-items: center;           /* 자식들을 가운데 정렬 */
+    gap: 12px;
+
     width: 100%;
-    pointer-events: auto;            /* 클릭 가능하게 유지 */
-    height: auto;                    /* 높이를 자동으로 설정 */
-    top: 40px;                       /* 원하는 위치로 조정 (상단 간격 조정) */
+    pointer-events: auto;
+    z-index: 5;
 }
+
 
 /* fixed 박스: 첫 번째 텍스트 박스 */
 .fixed {
-    max-width: 380px;
-    margin-bottom: 8px;
-    position: absolute;              /* 절대 위치 설정 */
-    left: 50%;
-    transform: translateX(-50%);     /* 화면 가운데 정렬 */
-    flex-shrink: 0;                  /* 고정된 크기 유지 */
+    position: static;          /* 화면 고정 아예 안 함 */
+    bottom: auto;
+    left: auto;
+    right: auto;
+
+    display: inline-block;
+    margin-bottom: 4px;        /* 아래 추천답변과 간격 */
 }
 
 /* dynamic-container: 추천 답변 박스들 */
 .dynamic-container {
     display: flex;
-    flex-direction: row;             /* 가로로 정렬 */
-    gap: 12px;                       /* 간격 조정 */
-    justify-content: center;         /* 가운데 정렬 */
-    flex-wrap: wrap;                 /* 화면 크기에 맞춰 줄바꿈 */
-    width: 100%;                     /* 너비 100%로 설정 */
-    margin-top: 20px;                /* fixed 박스 아래로 여백 추가 */
+    flex-direction: row;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+
+    /* 🔻 이 부분들 꼭 삭제 🔻
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    */
 }
 
 /* AI-recommended-answer 박스: 길어질 경우 줄바꿈 */
@@ -184,29 +197,30 @@ body {
     text-align: center;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
     cursor: pointer;
-    white-space: normal;             /* 한 줄이 아닌 여러 줄로 표시 */
-    word-wrap: break-word;           /* 긴 단어가 잘리지 않도록 줄바꿈 처리 */
-    min-width: 150px;                /* 최소 너비 설정 */
-    max-width: 300px;                /* 최대 너비 제한 */
-    flex-shrink: 0;                  /* 너비가 줄어들지 않도록 방지 */
-    flex-grow: 0;                    /* 크기 증가하지 않도록 방지 */
+    white-space: normal;
+    word-wrap: break-word;
+    min-width: 150px;
+    max-width: 300px;
+    flex-shrink: 0;
+    flex-grow: 0;
 }
 
 .AI-recommended-answer:hover {
     background-color: #E5E7EB;       /* 살짝 회색 하이라이트 */
 }
 
-
+/* 채팅 입력 영역 */
 .chat-input {
   display: flex;
   justify-content: space-between;
   margin-top: 15px;
   position: fixed;
-  bottom: 30px; /* 페이지 하단에서 20px 띄우기 */
+  bottom: 30px;                      /* 페이지 하단에서 20px 띄우기 */
   left: 50%;
-  transform: translateX(-50%); /* 가로로 중앙 정렬 */
-  width: 100%; /* 화면 너비의 90% */
-  margin-top: 30px; /* 위쪽 간격 추가 */
+  transform: translateX(-50%);       /* 가로로 중앙 정렬 */
+  width: 100%;                       /* 화면 너비의 90% */
+  margin-top: 30px;                  /* 위쪽 간격 추가 */
+  z-index: 1;                        /* 다른 요소들보다 아래로 배치 */
 }
 
 .chat-input input {

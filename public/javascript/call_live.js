@@ -76,6 +76,10 @@ socket.on("recommendations", ({ replies }) => {
   });
 });
 
+// 추천답변 내용 바뀔 때마다 이 함수 한번씩 호출해주면 됨
+// 예: 버튼을 새로 렌더링한 뒤
+// updateFixedPosition();
+
 
 // ===== 통화 요약 =====
 socket.on("call.summary", ({ summary }) => {
