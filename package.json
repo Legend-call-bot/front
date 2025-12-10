@@ -1,17 +1,32 @@
 {
   "name": "for_call_phobia",
   "version": "1.0.0",
-  "description": "",
+  "description": "��#\u0000 \u0000f\u0000r\u0000o\u0000n\u0000t\u0000\r\u0000 \u0000",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "body-parser": "^2.2.1",
     "dotenv": "^17.2.3",
-    "express": "^5.1.0",
-    "socket.io": "^4.8.1"
-  }
+    "express": "^5.2.1",
+    "microsoft-cognitiveservices-speech-sdk": "^1.47.0",
+    "socket.io": "^4.8.1",
+    "twilio": "^5.10.7",
+    "uuid": "^13.0.0",
+    "ws": "^8.18.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Legend-call-bot/front.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Legend-call-bot/front/issues"
+  },
+  "homepage": "https://github.com/Legend-call-bot/front#readme"
 }
