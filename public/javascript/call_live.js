@@ -26,7 +26,7 @@ if (phone && phoneDisplay) {
   phoneDisplay.textContent = formatKoreanPhone(phone);
 }
 // ===== 소켓 연결 =====
-const SERVER_URL = "https://unvolcanic-howard-unshapable.ngrok-free.dev";
+const SERVER_URL = window.location.origin;
 
 const socket = io(SERVER_URL, {
   transports: ["polling"],
