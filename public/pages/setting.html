@@ -108,15 +108,28 @@
                         // 미리듣기 버튼
                         document
                             .querySelector(".preview-btn")
-                            .addEventListener("click", function () {
+                            .addEventListener("click", async function () {
                                 const form =
                                     document.getElementById("settingsForm");
-                                const voice = form.voice.value;
+                                const voice = form.voice.value; // friendly_female 등
                                 const speed = form.speed.value;
 
-                                // TODO: 현재 선택된 voice/speed로 TTS 미리듣기 재생
-                                // 예: playTtsPreview({ voice, speed });
-                                console.log("Preview TTS:", { voice, speed });
+                                const res = await fetch("/tts-preview", {
+                                    method: "POST",
+                                    headers: {
+                                        "Content-Type": "application/json",
+                                    },
+                                    body: JSON.stringify({ voice, speed }),
+                                });
+
+                                const data = await res.json();
+                                if (!data.audioUrl) {
+                                    alert("TTS 미리듣기 생성에 실패했습니다.");
+                                    return;
+                                }
+
+                                const audio = new Audio(data.audioUrl);
+                                audio.play();
                             });
                     </script>
                 </section>

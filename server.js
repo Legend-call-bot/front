@@ -37,6 +37,10 @@ const {
     GEMINI_API_KEY,
     PORT = 3003,
     PUBLIC_HOST,
+    ELEVENLABS_VOICE_ID_BRIGHT,
+    ELEVENLABS_VOICE_ID_CLEAR,
+    ELEVENLABS_VOICE_ID_CALM,
+    ELEVENLABS_VOICE_ID_WARM,
 } = process.env;
 
 if (
@@ -64,6 +68,27 @@ const callVoiceMap = new Map();
 // ✅ 서버 전체 기본 목소리 (엔그록/서버 재시작 시 초기값)
 let CURRENT_VOICE_ID = ELEVENLABS_VOICE_ID;
 
+// 프리셋 키 → env에 저장된 실제 ElevenLabs voice id
+const VOICE_PRESET_MAP = {
+    friendly_female: ELEVENLABS_VOICE_ID_BRIGHT,
+    firm_female: ELEVENLABS_VOICE_ID_CLEAR,
+    calm_female: ELEVENLABS_VOICE_ID_CALM,
+    warm_female: ELEVENLABS_VOICE_ID_WARM,
+};
+
+function resolveVoiceId(presetKey, fallbackVoiceId) {
+    // 1순위: 프리셋에서 찾은 값
+    if (presetKey && VOICE_PRESET_MAP[presetKey]) {
+        return VOICE_PRESET_MAP[presetKey];
+    }
+    // 2순위: 서버 전체 기본값(CURRENT_VOICE_ID)
+    if (fallbackVoiceId) {
+        return fallbackVoiceId;
+    }
+    // 3순위: .env 기본값
+    return ELEVENLABS_VOICE_ID;
+}
+
 // ---------- 오디오 폴더 ----------
 const AUDIO_DIR = path.join(__dirname, "audio");
 if (!fs.existsSync(AUDIO_DIR)) fs.mkdirSync(AUDIO_DIR);
@@ -73,7 +98,6 @@ async function ensureDir(dir) {
         await fsp.mkdir(dir, { recursive: true });
     } catch {}
 }
-
 
 // ---------- ElevenLabs TTS ----------
 async function synthesizeToFile(text, filename, voiceIdOverride) {
@@ -87,10 +111,7 @@ async function synthesizeToFile(text, filename, voiceIdOverride) {
     const audioFile = path.join(AUDIO_DIR, filename);
 
     // 🔹 우선순위: override > CURRENT_VOICE_ID > .env
-    const voiceId =
-        voiceIdOverride ||
-        CURRENT_VOICE_ID ||
-        ELEVENLABS_VOICE_ID;
+    const voiceId = voiceIdOverride || CURRENT_VOICE_ID || ELEVENLABS_VOICE_ID;
 
     const url = `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_44100_128`;
 
@@ -118,7 +139,6 @@ async function synthesizeToFile(text, filename, voiceIdOverride) {
 
     return audioFile;
 }
-
 
 // ---------- Twilio 재생 ----------
 async function playToCall(callSid, audioUrl) {
@@ -170,9 +190,11 @@ function generateCallScript(intentText) {
 
 app.post("/calls", async (req, res) => {
     try {
-        const { phone, intentText, voiceId } = req.body;   // 🔹 voiceId 추가
+        const { phone, intentText, voice } = req.body;
         if (!phone || !intentText) {
-            return res.status(400).json({ error: "phone and intentText required" });
+            return res
+                .status(400)
+                .json({ error: "phone and intentText required" });
         }
 
         // ⭐ Twilio용 E.164 형식으로 전화번호 변환
@@ -187,11 +209,11 @@ app.post("/calls", async (req, res) => {
         const script = generateCallScript(intentText);
         const filename = `${uuidv4()}.mp3`;
 
-        // 🔹 이 통화에서 사용할 최종 보이스 결정
-        const effectiveVoiceId =
-            voiceId ||               // 콜 시작 시 프론트에서 보낸 값
-            CURRENT_VOICE_ID ||      // 서버 전체 기본값
-            ELEVENLABS_VOICE_ID;     // .env 기본값
+        // 🔹 프리셋 키 → 실제 ElevenLabs voiceId 해석
+        const effectiveVoiceId = resolveVoiceId(
+            voice,              // 프리셋 키 (friendly_female 등)
+            CURRENT_VOICE_ID    // 서버 전체 기본 보이스
+        );
 
         // 🔹 안내 멘트도 이 보이스로 TTS 생성
         await synthesizeToFile(script, filename, effectiveVoiceId);
@@ -204,7 +226,12 @@ app.post("/calls", async (req, res) => {
             to: e164Phone,
             from: TWILIO_FROM_NUMBER,
             statusCallback: `${PUBLIC_HOST}/call-status`,
-            statusCallbackEvent: ["initiated", "ringing", "answered", "completed"],
+            statusCallbackEvent: [
+                "initiated",
+                "ringing",
+                "answered",
+                "completed",
+            ],
             statusCallbackMethod: "POST",
         });
 
@@ -213,13 +240,36 @@ app.post("/calls", async (req, res) => {
         // 🔹 이 통화의 보이스 캐싱
         callVoiceMap.set(call.sid, effectiveVoiceId);
 
-        res.json({ callSid: call.sid, script, audioUrl });
+        res.json({
+            callSid: call.sid,
+            script,
+            audioUrl,
+            voiceId: effectiveVoiceId,
+        });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: err.message });
     }
 });
 
+app.post("/tts-preview", async (req, res) => {
+    try {
+        const { voice, speed } = req.body; // voice: 프리셋 키 (friendly_female 등)
+
+        const voiceId = resolveVoiceId(voice, CURRENT_VOICE_ID);
+
+        const sampleText = "안녕하세요. 이렇게 들립니다.";
+        const filename = `preview-${uuidv4()}.mp3`;
+
+        await synthesizeToFile(sampleText, filename, voiceId);
+        const audioUrl = `${PUBLIC_HOST}/audio/${filename}`;
+
+        res.json({ audioUrl, voiceId });
+    } catch (err) {
+        console.error("TTS preview error:", err);
+        res.status(500).json({ error: err.message });
+    }
+});
 
 // ---------- TwiML ----------
 app.all("/twilio/answer", (req, res) => {
@@ -409,7 +459,10 @@ wss.on("connection", (ws, req) => {
             });
 
             const historyText = conversationHistory
-                .map((m) => `${m.role === "user" ? "사용자" : "AI"}: ${m.content}`)
+                .map(
+                    (m) =>
+                        `${m.role === "user" ? "사용자" : "AI"}: ${m.content}`
+                )
                 .join("\n");
 
             const result = await model.generateContent(`
@@ -489,7 +542,9 @@ ${historyText}
             } else if (data.event === "stop") {
                 console.log("🛑 Media stream stopped:", callSid || "(unknown)");
                 pushStream.close();
-                recognizer.stopContinuousRecognitionAsync(() => recognizer.close());
+                recognizer.stopContinuousRecognitionAsync(() =>
+                    recognizer.close()
+                );
 
                 if (callSid && callHistories.has(callSid)) {
                     summarizeCall(callSid, callHistories.get(callSid));
