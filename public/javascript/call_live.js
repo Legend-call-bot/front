@@ -92,23 +92,45 @@ socket.on("recommendations", ({ replies }) => {
     });
 });
 
-// ===== 통화 요약 =====
+let hasSummary = false;
+let shouldRedirect = false;
+
 socket.on("call.summary", ({ summary }) => {
     addMessage("📄 통화 요약", summary);
-});
+    hasSummary = true;
 
-// 서버에서 "통화가 끝났다"는 알림이 온 경우 (상대방이 폰에서 끊었을 때 포함)
-socket.on("call.ended.remote", ({ callSid: endedSid }) => {
-    console.log("📴 서버로부터 통화 종료 알림 수신:", endedSid);
-
-    // 혹시 다른 콜Sid가 섞일 수 있으니 한 번 체크
-    if (callSid && endedSid && callSid !== endedSid) {
-        console.warn("다른 콜 SID의 종료 이벤트입니다. 무시:", endedSid);
-        return;
+    try {
+        localStorage.setItem("lastCallSummary", summary);
+        const phoneText = phoneDisplay ? phoneDisplay.textContent : "";
+        if (phoneText) {
+            localStorage.setItem("lastCallNumber", phoneText);
+        }
+    } catch (e) {
+        console.warn("통화 요약 로컬 저장 실패:", e);
     }
 
-    // 통화 종료 화면으로 이동
-    window.location.href = "finished_call.html";
+    if (shouldRedirect) {
+        window.location.href = "finished_call.html";
+    }
+});
+
+socket.on("call.ended.remote", ({ callSid: endedSid }) => {
+    if (callSid && endedSid && callSid !== endedSid) return;
+
+    if (hasSummary) {
+        // 요약 이미 저장됨 → 바로 이동
+        window.location.href = "finished_call.html";
+    } else {
+        // 요약 올 때까지 기다렸다가 이동
+        shouldRedirect = true;
+
+        // 너무 안 오면 3초 후 강제 이동 (옵션)
+        setTimeout(() => {
+            if (!hasSummary) {
+                window.location.href = "finished_call.html";
+            }
+        }, 3000);
+    }
 });
 
 // ===== 채팅 입력 전송 =====
