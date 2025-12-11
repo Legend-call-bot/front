@@ -97,13 +97,18 @@ socket.on("call.summary", ({ summary }) => {
     addMessage("📄 통화 요약", summary);
 });
 
-// (선택) 서버에서 종료 ACK 받을 때 디버깅용
-socket.on("call.ended.ack", ({ ok, message }) => {
-    if (!ok) {
-        console.error("통화 종료 실패:", message);
-    } else {
-        console.log("통화 종료 ACK 수신");
+// 서버에서 "통화가 끝났다"는 알림이 온 경우 (상대방이 폰에서 끊었을 때 포함)
+socket.on("call.ended.remote", ({ callSid: endedSid }) => {
+    console.log("📴 서버로부터 통화 종료 알림 수신:", endedSid);
+
+    // 혹시 다른 콜Sid가 섞일 수 있으니 한 번 체크
+    if (callSid && endedSid && callSid !== endedSid) {
+        console.warn("다른 콜 SID의 종료 이벤트입니다. 무시:", endedSid);
+        return;
     }
+
+    // 통화 종료 화면으로 이동
+    window.location.href = "finished_call.html";
 });
 
 // ===== 채팅 입력 전송 =====
@@ -123,11 +128,13 @@ endCallBtn.addEventListener("click", () => {
         return;
     }
 
+    // 버튼 여러 번 눌리는 것 방지
+    endCallBtn.disabled = true;
+
     // 🔴 서버에 통화 종료 요청
     socket.emit("call.ended.byUser", { callSid });
 
-    alert("통화를 종료합니다.");
-    window.location.href = "call.html";
+    console.log("통화 종료 요청 전송:", callSid);
 });
 
 // ===== 채팅 출력 함수 =====

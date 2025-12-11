@@ -58,6 +58,12 @@ const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 // ✅ 통화별 대화기록 저장소
 const callHistories = new Map();
 
+// ✅ 통화별 보이스 캐시 (callSid → voiceId)
+const callVoiceMap = new Map();
+
+// ✅ 서버 전체 기본 목소리 (엔그록/서버 재시작 시 초기값)
+let CURRENT_VOICE_ID = ELEVENLABS_VOICE_ID;
+
 // ---------- 오디오 폴더 ----------
 const AUDIO_DIR = path.join(__dirname, "audio");
 if (!fs.existsSync(AUDIO_DIR)) fs.mkdirSync(AUDIO_DIR);
@@ -68,8 +74,9 @@ async function ensureDir(dir) {
     } catch {}
 }
 
+
 // ---------- ElevenLabs TTS ----------
-async function synthesizeToFile(text, filename) {
+async function synthesizeToFile(text, filename, voiceIdOverride) {
     if (!ELEVENLABS_API_KEY || !ELEVENLABS_VOICE_ID) {
         throw new Error(
             "ELEVENLABS_API_KEY 또는 ELEVENLABS_VOICE_ID가 설정되지 않았습니다."
@@ -79,7 +86,13 @@ async function synthesizeToFile(text, filename) {
     await fsp.mkdir(AUDIO_DIR, { recursive: true });
     const audioFile = path.join(AUDIO_DIR, filename);
 
-    const url = `https://api.elevenlabs.io/v1/text-to-speech/${ELEVENLABS_VOICE_ID}?output_format=mp3_44100_128`;
+    // 🔹 우선순위: override > CURRENT_VOICE_ID > .env
+    const voiceId =
+        voiceIdOverride ||
+        CURRENT_VOICE_ID ||
+        ELEVENLABS_VOICE_ID;
+
+    const url = `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_44100_128`;
 
     const res = await fetch(url, {
         method: "POST",
@@ -101,10 +114,11 @@ async function synthesizeToFile(text, filename) {
 
     const arrayBuf = await res.arrayBuffer();
     await fsp.writeFile(audioFile, Buffer.from(arrayBuf));
-    console.log("[TTS 완료 - ElevenLabs]", audioFile);
+    console.log("[TTS 완료 - ElevenLabs]", audioFile, "voiceId:", voiceId);
 
     return audioFile;
 }
+
 
 // ---------- Twilio 재생 ----------
 async function playToCall(callSid, audioUrl) {
@@ -140,6 +154,13 @@ app.post(
             io.emit("call.accepted", { callSid });
         }
 
+        // ✅ 통화가 완전히 끝났을 때 (상대방이 폰에서 끊은 경우 포함)
+        if (callStatus === "completed") {
+            console.log("📴 통화가 종료되었습니다:", callSid);
+            // 이 callSid 방에 들어있는 프론트들에게 종료 이벤트 전파
+            io.to(callSid).emit("call.ended.remote", { callSid });
+        }
+
         res.sendStatus(200);
     }
 );
@@ -151,7 +172,7 @@ function generateCallScript(intentText) {
 
 app.post("/calls", async (req, res) => {
     try {
-        const { phone, intentText } = req.body;
+        const { phone, intentText, voiceId } = req.body;   // 🔹 voiceId 추가
         if (!phone || !intentText) {
             return res.status(400).json({ error: "phone and intentText required" });
         }
@@ -167,7 +188,15 @@ app.post("/calls", async (req, res) => {
 
         const script = generateCallScript(intentText);
         const filename = `${uuidv4()}.mp3`;
-        await synthesizeToFile(script, filename);
+
+        // 🔹 이 통화에서 사용할 최종 보이스 결정
+        const effectiveVoiceId =
+            voiceId ||               // 콜 시작 시 프론트에서 보낸 값
+            CURRENT_VOICE_ID ||      // 서버 전체 기본값
+            ELEVENLABS_VOICE_ID;     // .env 기본값
+
+        // 🔹 안내 멘트도 이 보이스로 TTS 생성
+        await synthesizeToFile(script, filename, effectiveVoiceId);
         const audioUrl = `${PUBLIC_HOST}/audio/${filename}`;
 
         const call = await twilioClient.calls.create({
@@ -182,12 +211,17 @@ app.post("/calls", async (req, res) => {
         });
 
         console.log("📞 Call initiated:", call.sid);
+
+        // 🔹 이 통화의 보이스 캐싱
+        callVoiceMap.set(call.sid, effectiveVoiceId);
+
         res.json({ callSid: call.sid, script, audioUrl });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: err.message });
     }
 });
+
 
 // ---------- TwiML ----------
 app.all("/twilio/answer", (req, res) => {
