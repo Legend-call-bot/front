@@ -9,7 +9,7 @@
     </head>
     <body>
         <div class="container">
-            <!-- 상단 보라 헤더 영역 그대로 재사용 -->
+            <!-- 상단 보라 헤더 -->
             <div class="header-box">
                 <h1><a href="call.html">for call phobia</a></h1>
             </div>
@@ -22,103 +22,45 @@
                     <h2 class="settings-title">설정</h2>
 
                     <!-- 폼 영역 -->
-                    <form class="settings-form">
-                        <!-- 1. Twilio 번호 연결 확인 -->
-                        <div class="settings-row">
-                            <label class="settings-checkline">
-                                <input
-                                    type="checkbox"
-                                    class="settings-checkbox"
-                                />
-                                <span class="settings-label-text"
-                                    >Twilio 번호 연결 확인</span
-                                >
-                            </label>
-                            <div class="settings-body">
-                                <input
-                                    type="text"
-                                    class="settings-input"
-                                    value="+1 10 1234 5678"
-                                />
-                            </div>
-                        </div>
-
-                        <!-- 2. 녹음, 자막 저장 동의 -->
-                        <div class="settings-row">
-                            <label class="settings-checkline">
-                                <input
-                                    type="checkbox"
-                                    class="settings-checkbox"
-                                />
-                                <span class="settings-label-text">
-                                    녹음, 자막 저장 등의<br />
-                                    STT/TTS 처리·보관 약관
-                                </span>
-                            </label>
-                        </div>
-
-                        <!-- 3. TTS 프리셋 -->
+                    <form class="settings-form" id="settingsForm">
+                        <!-- TTS 프리셋 -->
                         <div class="settings-row">
                             <div class="settings-row-top">
                                 <label class="settings-checkline">
                                     <input
                                         type="checkbox"
                                         class="settings-checkbox"
+                                        checked
                                     />
-                                    <span class="settings-label-text"
-                                        >TTS 프리셋</span
-                                    >
+                                    <span class="settings-label-text">
+                                        TTS 프리셋
+                                    </span>
                                 </label>
                                 <button type="button" class="preview-btn">
                                     미리듣기
                                 </button>
                             </div>
                             <div class="settings-body">
-                                <select class="settings-select">
-                                    <option>목소리</option>
-                                    <option>다른 목소리</option>
+                                <select class="settings-select" name="voice">
+                                    <option value="friendly_female">
+                                        밝고 친근한 톤
+                                    </option>
+                                    <option value="firm_female">
+                                        또렷하고 단호한 톤
+                                    </option>
+                                    <option value="calm_female">
+                                        차분하고 안정적인 톤
+                                    </option>
+                                    <option value="warm_female">
+                                        따뜻하고 공감적인 톤
+                                    </option>
                                 </select>
 
-                                <select class="settings-select">
-                                    <option>속도 보통</option>
-                                    <option>조금 느리게</option>
-                                    <option>조금 빠르게</option>
+                                <select class="settings-select" name="speed">
+                                    <option value="normal">속도 보통</option>
+                                    <option value="slow">조금 느리게</option>
+                                    <option value="fast">조금 빠르게</option>
                                 </select>
-                            </div>
-                        </div>
-
-                        <!-- 4. 수신 기본 상태 -->
-                        <div class="settings-row">
-                            <label class="settings-checkline">
-                                <input
-                                    type="checkbox"
-                                    class="settings-checkbox"
-                                />
-                                <span class="settings-label-text">
-                                    수신 기본 상태<br />
-                                    로그인 시 기본값: 수신
-                                </span>
-                            </label>
-                            <div class="settings-body">
-                                <div class="radio-group">
-                                    <label class="radio-option">
-                                        <input
-                                            type="radio"
-                                            name="status"
-                                            value="on"
-                                            checked
-                                        />
-                                        <span class="radio-text">ON</span>
-                                    </label>
-                                    <label class="radio-option">
-                                        <input
-                                            type="radio"
-                                            name="status"
-                                            value="off"
-                                        />
-                                        <span class="radio-text">OFF</span>
-                                    </label>
-                                </div>
                             </div>
                         </div>
 
@@ -127,7 +69,18 @@
                             완료
                         </button>
                     </form>
-                </section>
+
+                    <script>
+                        document
+                            .getElementById("settingsForm")
+                            .addEventListener("submit", function (e) {
+                                e.preventDefault();
+
+                                // TODO: 나중에 여기서 프리셋 저장 (localStorage나 서버 호출 등)
+
+                                window.location.href = "call.html";
+                            });
+                    </script>
             </main>
 
             <!-- 고정 하단 푸터 -->
@@ -135,8 +88,9 @@
                 <a
                     href="terms_of_service_and_privacy_policy.html"
                     class="legal-link"
-                    >약관 | 개인정보처리방침</a
                 >
+                    약관 | 개인정보처리방침
+                </a>
             </div>
         </div>
     </body>

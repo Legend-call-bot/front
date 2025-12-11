@@ -63,7 +63,7 @@
     width: 18px;
     height: 18px;
     position: relative;
-    top: -9px;
+    top: 0;
     accent-color: #6750a4;
 }
 
@@ -88,30 +88,6 @@
     box-sizing: border-box;
     font-size: 15px;
     line-height: 1.4;
-}
-
-/* Twilio 번호 연결 확인 */
-.settings-form .settings-row:first-of-type {
-    gap: 0;
-}
-
-.settings-form .settings-row:first-of-type .settings-input {
-    width: 200px;
-    min-width: 0;
-}
-
-.settings-form .settings-row:first-of-type .settings-checkline {
-    align-items: center;
-    margin-bottom: 0;
-}
-
-.settings-form .settings-row:first-of-type .settings-checkbox {
-    top: 0;
-}
-
-.settings-form .settings-row:first-of-type .settings-body {
-    margin-top: 0;
-    gap: 0;
 }
 
 /* TTS 프리셋 행 */
@@ -174,27 +150,6 @@
     color: #111;
 }
 
-/* 라디오 그룹 */
-.radio-group {
-    display: flex;
-    align-items: center;
-    gap: 24px;
-    font-size: 16px;
-    line-height: 1.4;
-}
-
-.radio-option {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.radio-option input[type="radio"] {
-    width: 20px;
-    height: 20px;
-    accent-color: #111;
-}
-
 /* 완료 버튼 */
 .settings-submit-btn {
     display: inline-flex;
@@ -211,23 +166,6 @@
     border: 1.5px solid #6750a4;
     box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03);
     cursor: pointer;
-}
-
-/* 기타 링크 */
-.logout-link,
-.policy-link {
-    color: #111;
-    text-decoration: none;
-}
-
-.policy-link {
-    font-size: 16px;
-    color: #444;
-}
-
-.logout-link:hover,
-.policy-link:hover {
-    text-decoration: underline;
 }
 
 .settings-input:hover,
