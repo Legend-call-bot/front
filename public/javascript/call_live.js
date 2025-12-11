@@ -128,7 +128,7 @@ endCallBtn.addEventListener("click", () => {
         return;
     }
 
-    // 버튼 여러 번 눌리는 것 방지
+    // 중복 클릭 방지
     endCallBtn.disabled = true;
 
     // 🔴 서버에 통화 종료 요청

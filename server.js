@@ -154,10 +154,8 @@ app.post(
             io.emit("call.accepted", { callSid });
         }
 
-        // ✅ 통화가 완전히 끝났을 때 (상대방이 폰에서 끊은 경우 포함)
         if (callStatus === "completed") {
             console.log("📴 통화가 종료되었습니다:", callSid);
-            // 이 callSid 방에 들어있는 프론트들에게 종료 이벤트 전파
             io.to(callSid).emit("call.ended.remote", { callSid });
         }
 
@@ -562,23 +560,20 @@ io.on("connection", (socket) => {
     socket.on("call.ended.byUser", async ({ callSid }) => {
         console.log("📴 사용자 측 통화 종료 요청:", callSid);
         if (!callSid) {
-            socket.emit("call.ended.ack", {
-                ok: false,
-                message: "callSid가 없습니다.",
-            });
+            console.warn("callSid가 없어 통화 종료 요청을 처리할 수 없습니다.");
             return;
         }
 
         try {
             await twilioClient.calls(callSid).update({ status: "completed" });
             console.log("✅ Twilio 통화 강제 종료 완료:", callSid);
-            socket.emit("call.ended.ack", { ok: true });
+
+            // ✅ 이 통화에 참여 중인 프론트들 모두에게 종료 이벤트 전송
+            io.to(callSid).emit("call.ended.remote", { callSid });
         } catch (err) {
             console.error("❌ Twilio 통화 종료 실패:", err);
-            socket.emit("call.ended.ack", {
-                ok: false,
-                message: err.message,
-            });
+            // 필요하면 에러 이벤트 따로 만들 수도 있음 (선택)
+            // socket.emit("call.ended.error", { message: err.message });
         }
     });
 });
