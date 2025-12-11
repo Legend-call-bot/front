@@ -43,17 +43,31 @@ const {
     ELEVENLABS_VOICE_ID_WARM,
 } = process.env;
 
-if (
-    !TWILIO_ACCOUNT_SID ||
-    !TWILIO_AUTH_TOKEN ||
-    !TWILIO_FROM_NUMBER ||
-    !AZURE_SPEECH_KEY ||
-    !AZURE_SPEECH_REGION ||
-    !PUBLIC_HOST
-) {
-    console.warn(
-        "⚠️ 환경변수 미설정: TWILIO_*, AZURE_SPEECH_*, PUBLIC_HOST 필요."
-    );
+// 필수 환경변수 관리 (PORT처럼 기본값 있으면 제외)
+const requiredEnv = {
+    TWILIO_ACCOUNT_SID,
+    TWILIO_AUTH_TOKEN,
+    TWILIO_FROM_NUMBER,
+    AZURE_SPEECH_KEY,
+    AZURE_SPEECH_REGION,
+    PUBLIC_HOST,
+    ELEVENLABS_API_KEY,
+    ELEVENLABS_MODEL_ID,
+    ELEVENLABS_VOICE_ID_BRIGHT,
+    ELEVENLABS_VOICE_ID_CLEAR,
+    ELEVENLABS_VOICE_ID_CALM,
+    ELEVENLABS_VOICE_ID_WARM,
+    GEMINI_API_KEY,
+};
+
+// 값이 비어있는(undef / 빈 문자열 등) 환경변수만 추출
+const missingEnvKeys = Object.entries(requiredEnv)
+    .filter(([_, value]) => !value)
+    .map(([key]) => key);
+
+if (missingEnvKeys.length > 0) {
+    console.warn("⚠️ 다음 환경변수가 설정되지 않았습니다:");
+    console.warn("   " + missingEnvKeys.join(", "));
 }
 
 const twilioClient = Twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
