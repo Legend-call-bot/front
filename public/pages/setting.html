@@ -41,26 +41,44 @@
                                 </button>
                             </div>
                             <div class="settings-body">
-                                <select class="settings-select" name="voice">
-                                    <option value="friendly_female">
-                                        밝고 친근한 톤
-                                    </option>
-                                    <option value="firm_female">
-                                        또렷하고 단호한 톤
-                                    </option>
-                                    <option value="calm_female">
-                                        차분하고 안정적인 톤
-                                    </option>
-                                    <option value="warm_female">
-                                        따뜻하고 공감적인 톤
-                                    </option>
-                                </select>
+                                <!-- 톤 -->
+                                <div class="settings-inline-row">
+                                    <span class="settings-inline-label"
+                                        >톤</span
+                                    >
+                                    <select
+                                        class="settings-select"
+                                        name="voice"
+                                    >
+                                        <option value="friendly_female">
+                                            밝고 친근한
+                                        </option>
+                                        <option value="firm_female">
+                                            또렷하고 단호한
+                                        </option>
+                                        <option value="calm_female">
+                                            차분하고 안정적인
+                                        </option>
+                                        <option value="warm_female">
+                                            따뜻하고 공감적인
+                                        </option>
+                                    </select>
+                                </div>
 
-                                <select class="settings-select" name="speed">
-                                    <option value="normal">속도 보통</option>
-                                    <option value="slow">조금 느리게</option>
-                                    <option value="fast">조금 빠르게</option>
-                                </select>
+                                <!-- 속도 -->
+                                <div class="settings-inline-row">
+                                    <span class="settings-inline-label"
+                                        >속도</span
+                                    >
+                                    <select
+                                        class="settings-select"
+                                        name="speed"
+                                    >
+                                        <option value="normal">보통</option>
+                                        <option value="slow">느림</option>
+                                        <option value="fast">빠름</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
@@ -71,16 +89,37 @@
                     </form>
 
                     <script>
+                        // 폼 제출(완료 버튼)
                         document
                             .getElementById("settingsForm")
                             .addEventListener("submit", function (e) {
                                 e.preventDefault();
 
-                                // TODO: 나중에 여기서 프리셋 저장 (localStorage나 서버 호출 등)
+                                const form = e.target;
+                                const voice = form.voice.value;
+                                const speed = form.speed.value;
+
+                                // TODO: TTS 프리셋 저장 (localStorage 또는 서버 API 호출)
+                                // 예: saveTtsPreset({ voice, speed });
 
                                 window.location.href = "call.html";
                             });
+
+                        // 미리듣기 버튼
+                        document
+                            .querySelector(".preview-btn")
+                            .addEventListener("click", function () {
+                                const form =
+                                    document.getElementById("settingsForm");
+                                const voice = form.voice.value;
+                                const speed = form.speed.value;
+
+                                // TODO: 현재 선택된 voice/speed로 TTS 미리듣기 재생
+                                // 예: playTtsPreview({ voice, speed });
+                                console.log("Preview TTS:", { voice, speed });
+                            });
                     </script>
+                </section>
             </main>
 
             <!-- 고정 하단 푸터 -->
