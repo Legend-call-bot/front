@@ -1,72 +1,86 @@
 <!DOCTYPE html>
 <html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>for call phobia - 통화</title>
-    <link rel="stylesheet" href="../css/call.css" />
-  </head>
-  <body>
-    <div class="container">
-      <div class="header-box">
-        <h1><a href="call.html">for call phobia</a></h1>
-      </div>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>for call phobia - 통화</title>
+        <link rel="stylesheet" href="../css/call.css" />
+    </head>
+    <body>
+        <div class="container">
+            <div class="header-box">
+                <h1><a href="call.html">for call phobia</a></h1>
+                <a href="setting.html" class="settings-icon" aria-label="설정">
+                    <svg
+                        width="28"
+                        height="28"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M8.51667 23.3333L8.05 19.6C7.79722 19.5028 7.55903 19.3861 7.33542 19.25C7.11181 19.1139 6.89306 18.9681 6.67917 18.8125L3.20833 20.2708L0 14.7292L3.00417 12.4542C2.98472 12.3181 2.975 12.1868 2.975 12.0604V11.2729C2.975 11.1465 2.98472 11.0153 3.00417 10.8792L0 8.60417L3.20833 3.0625L6.67917 4.52083C6.89306 4.36528 7.11667 4.21944 7.35 4.08333C7.58333 3.94722 7.81667 3.83056 8.05 3.73333L8.51667 0H14.9333L15.4 3.73333C15.6528 3.83056 15.891 3.94722 16.1146 4.08333C16.3382 4.21944 16.5569 4.36528 16.7708 4.52083L20.2417 3.0625L23.45 8.60417L20.4458 10.8792C20.4653 11.0153 20.475 11.1465 20.475 11.2729V12.0604C20.475 12.1868 20.4556 12.3181 20.4167 12.4542L23.4208 14.7292L20.2125 20.2708L16.7708 18.8125C16.5569 18.9681 16.3333 19.1139 16.1 19.25C15.8667 19.3861 15.6333 19.5028 15.4 19.6L14.9333 23.3333H8.51667ZM10.5583 21H12.8625L13.2708 17.9083C13.8736 17.7528 14.4326 17.5243 14.9479 17.2229C15.4632 16.9215 15.9347 16.5569 16.3625 16.1292L19.25 17.325L20.3875 15.3417L17.8792 13.4458C17.9764 13.1736 18.0444 12.8868 18.0833 12.5854C18.1222 12.284 18.1417 11.9778 18.1417 11.6667C18.1417 11.3556 18.1222 11.0493 18.0833 10.7479C18.0444 10.4465 17.9764 10.1597 17.8792 9.8875L20.3875 7.99167L19.25 6.00833L16.3625 7.23333C15.9347 6.78611 15.4632 6.41181 14.9479 6.11042C14.4326 5.80903 13.8736 5.58056 13.2708 5.425L12.8917 2.33333H10.5875L10.1792 5.425C9.57639 5.58056 9.01736 5.80903 8.50208 6.11042C7.98681 6.41181 7.51528 6.77639 7.0875 7.20417L4.2 6.00833L3.0625 7.99167L5.57083 9.85833C5.47361 10.15 5.40556 10.4417 5.36667 10.7333C5.32778 11.025 5.30833 11.3361 5.30833 11.6667C5.30833 11.9778 5.32778 12.2792 5.36667 12.5708C5.40556 12.8625 5.47361 13.1542 5.57083 13.4458L3.0625 15.3417L4.2 17.325L7.0875 16.1C7.51528 16.5472 7.98681 16.9215 8.50208 17.2229C9.01736 17.5243 9.57639 17.7528 10.1792 17.9083L10.5583 21ZM11.7833 15.75C12.9111 15.75 13.8736 15.3514 14.6708 14.5542C15.4681 13.7569 15.8667 12.7944 15.8667 11.6667C15.8667 10.5389 15.4681 9.57639 14.6708 8.77917C13.8736 7.98195 12.9111 7.58333 11.7833 7.58333C10.6361 7.58333 9.66875 7.98195 8.88125 8.77917C8.09375 9.57639 7.7 10.5389 7.7 11.6667C7.7 12.7944 8.09375 13.7569 8.88125 14.5542C9.66875 15.3514 10.6361 15.75 11.7833 15.75Z"
+                            fill="#1D1B20"
+                        />
+                    </svg>
+                </a>
+            </div>
 
-      <div class="call-section">
-        <h2 class="second-title">for call phobia</h2>
-        <h3 class="welcome">환영합니다, 계정이름님!</h3>
+            <div class="call-section">
+                <h2 class="second-title">for call phobia</h2>
+                <h3 class="welcome">환영합니다, 계정이름님!</h3>
 
-        <input
-          class="input-phone-number"
-          type="text"
-          id="phone"
-          value="+82 10-"
-        />
-        <textarea
-          class="intent-box"
-          id="intentText"
-          placeholder="통화 목적을 입력하세요.
+                <input
+                    class="input-phone-number"
+                    type="text"
+                    id="phone"
+                    value="+82 10-"
+                />
+                <textarea
+                    class="intent-box"
+                    id="intentText"
+                    placeholder="통화 목적을 입력하세요.
 (예: 오늘 7시에 식사 예약 가능한가요? 등)"
-        ></textarea>
-        <button class="phone-number-list-button">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M20.3995 21.5999L20.3998 18.0002C20.4 16.0119 18.7881 14.3999 16.7998 14.3999H7.2005C5.21244 14.3999 3.60073 16.0114 3.6005 17.9995L3.6001 21.5999M15.6001 5.9999C15.6001 7.98813 13.9883 9.5999 12.0001 9.5999C10.0119 9.5999 8.4001 7.98813 8.4001 5.9999C8.4001 4.01168 10.0119 2.3999 12.0001 2.3999C13.9883 2.3999 15.6001 4.01168 15.6001 5.9999Z"
-              stroke="black"
-              stroke-width="2"
-            />
-          </svg>
-          전화번호부
-        </button>
+                ></textarea>
+                <button class="phone-number-list-button">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                        <path
+                            d="M20.3995 21.5999L20.3998 18.0002C20.4 16.0119 18.7881 14.3999 16.7998 14.3999H7.2005C5.21244 14.3999 3.60073 16.0114 3.6005 17.9995L3.6001 21.5999M15.6001 5.9999C15.6001 7.98813 13.9883 9.5999 12.0001 9.5999C10.0119 9.5999 8.4001 7.98813 8.4001 5.9999C8.4001 4.01168 10.0119 2.3999 12.0001 2.3999C13.9883 2.3999 15.6001 4.01168 15.6001 5.9999Z"
+                            stroke="black"
+                            stroke-width="2"
+                        />
+                    </svg>
+                    전화번호부
+                </button>
 
-        <button class="call-button" id="callBtn">통화 시작</button>
-      </div>
+                <button class="call-button" id="callBtn">통화 시작</button>
+            </div>
 
-      <div class="footer2">
-        <p><a href="service.html">제공 서비스 / 도움말</a></p>
-      </div>
+            <div class="footer2">
+                <p><a href="service.html">제공 서비스 / 도움말</a></p>
+            </div>
 
-      <div class="footer">
-        <p>
-          <a href="terms_of_service_and_privacy_policy.html"
-            >약관 | 개인정보 처리 방침</a
-          >
-        </p>
-      </div>
-    </div>
-    <script>
-      // 전화번호부 버튼 클릭 시 전화번호 리스트 페이지로 이동
-      document
-        .querySelector('.phone-number-list-button')
-        .addEventListener('click', function () {
-          // call.html 이 /pages/call.html 이고,
-          // phone_number_list.html 도 /pages 안에 있다면:
-          window.location.href = 'phone_number_list.html';
-          // 만약 call.html이 루트(/call.html)에 있고, 리스트가 /pages/phone_number_list.html이면:
-          // window.location.href = 'pages/phone_number_list.html';
-        });
-    </script>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="../javascript/call.js"></script>
-  </body>
+            <div class="footer">
+                <p>
+                    <a href="terms_of_service_and_privacy_policy.html"
+                        >약관 | 개인정보 처리 방침</a
+                    >
+                </p>
+            </div>
+        </div>
+        <script>
+            // 전화번호부 버튼 클릭 시 전화번호 리스트 페이지로 이동
+            document
+                .querySelector(".phone-number-list-button")
+                .addEventListener("click", function () {
+                    // call.html 이 /pages/call.html 이고,
+                    // phone_number_list.html 도 /pages 안에 있다면:
+                    window.location.href = "phone_number_list.html";
+                    // 만약 call.html이 루트(/call.html)에 있고, 리스트가 /pages/phone_number_list.html이면:
+                    // window.location.href = 'pages/phone_number_list.html';
+                });
+        </script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="../javascript/call.js"></script>
+    </body>
 </html>
