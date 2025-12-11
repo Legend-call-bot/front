@@ -16,7 +16,6 @@ body {
 }
 
 /* 헤더 스타일 */
-
 .header-box {
     display: flex;
     height: 50px;
@@ -162,20 +161,22 @@ button {
 }
 
 .call-summary {
-    max-width: 90%;
-    margin: 20px auto 0;
-    padding: 12px 16px;
-    border-radius: 8px;
+    max-width: 600px;
+    width: 90%;
+    margin: 24px auto 0;
+    padding: 16px 20px;
+    border-radius: 20px;
+    border: 1px solid #e5e7eb;
     background-color: #f3f4ff;
     font-size: 14px;
     line-height: 1.5;
     color: #111827;
-    white-space: pre-line; /* 줄바꿈 유지 */
+    white-space: pre-line;
+    text-align: left;
 }
 
 .call-summary-title {
     font-weight: bold;
-    margin-bottom: 8px;
-    text-align: center;
     font-size: 15px;
+    text-align: left;
 }
