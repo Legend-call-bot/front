@@ -14,3 +14,6 @@ build/
 
 # 기타 비공개로 두고 싶은 폴더
 audio/
+
+# Prisma generated
+src/generated/prisma/
