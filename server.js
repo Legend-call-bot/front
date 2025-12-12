@@ -9,6 +9,7 @@ const { Server: IOServer } = require("socket.io");
 
 const { AUDIO_DIR } = require("./src/utils/audio");
 const { PORT } = require("./src/config/env");
+const registerUserRoutes = require("./src/routes/userRoutes");
 const registerCallRoutes = require("./src/routes/callRoutes");
 const registerTwilioRoutes = require("./src/routes/twilioRoutes");
 const initFrontendSocket = require("./src/sockets/frontendSocket");
@@ -28,6 +29,7 @@ app.get("/", (req, res) => {
 });
 
 // 라우트 등록
+registerUserRoutes(app);
 registerCallRoutes(app, io);
 registerTwilioRoutes(app);
 

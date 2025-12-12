@@ -1,6 +1,28 @@
 // ⭐ 공통 서버 주소 (ngrok 주소)
 const SERVER_URL = window.location.origin;
 
+async function ensureUserId() {
+    let userId = localStorage.getItem("userId");
+    if (userId) return userId;
+
+    const res = await fetch(`${SERVER_URL}/api/users/session`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({}),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || !data.userId) {
+        throw new Error(data.error || "userId 발급 실패");
+    }
+
+    localStorage.setItem("userId", data.userId);
+    return data.userId;
+}
+
 // ⭐ 저장용 전역 변수
 let globalPhone = null;
 
@@ -32,11 +54,11 @@ socket.on("call.accepted", ({ callSid }) => {
 // =============================
 const callButton = document.querySelector(".call-button");
 const phoneInput = document.getElementById("phone");
-const intentInput = document.getElementById("intentText");   // ✅ 통화 목적 textarea
+const intentInput = document.getElementById("intentText");
 
 callButton.addEventListener("click", async () => {
     let phone = phoneInput.value.trim();
-    const intentText = intentInput.value.trim();             // ✅ 하드코딩 대신 입력값 사용
+    const intentText = intentInput.value.trim();
 
     if (!phone) {
         alert("전화번호를 입력하세요!");
@@ -48,32 +70,43 @@ callButton.addEventListener("click", async () => {
         return;
     }
 
-    // ⭐⭐⭐ 전화번호 보정 ⭐⭐⭐
-    phone = phone.replace(/^\+82/, ""); // +82 제거
-    phone = phone.replace(/^82/, "");   // 82 제거
+    phone = phone.replace(/^\+82/, "");
+    phone = phone.replace(/^82/, "");
     if (!phone.startsWith("0")) phone = "0" + phone;
 
     globalPhone = phone;
 
     try {
+        const userId = await ensureUserId();
+
         const response = await fetch(`${SERVER_URL}/calls`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
+                userId,
                 phone,
-                intentText, // ✅ 사용자가 입력한 내용 그대로 서버로 전달
+                intentText,
             }),
         });
 
         const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "전화 발신 실패");
+        }
+
         console.log("📡 발신 완료:", data);
 
         callButton.innerText = "전화 연결 중...";
         callButton.disabled = true;
     } catch (err) {
         console.error("❌ 전화 발신 실패:", err);
-        alert("전화 발신 실패");
+        alert(err.message || "전화 발신 실패");
     }
+});
+
+window.addEventListener("DOMContentLoaded", () => {
+    ensureUserId().catch(console.error);
 });

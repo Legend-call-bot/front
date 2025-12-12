@@ -14,32 +14,42 @@ model User {
   preferredVoiceId String?
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
+
+  contacts         Contact[]
   calls            Call[]
+}
+
+model Contact {
+  id          String   @id @default(uuid())
+  userId      String
+  phoneNumber String
+  name        String?
+  memo        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  calls       Call[]
+
+  @@unique([userId, phoneNumber])
+  @@index([userId, createdAt])
 }
 
 model Call {
   id         String   @id @default(uuid())
   callSid    String   @unique
+
   userId     String
+  contactId  String
+
   voiceId    String?
   transcript String?
   summary    String?
   createdAt  DateTime @default(now())
 
-  user    User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  replies SuggestedReply[]
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contact    Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt])
-}
-
-model SuggestedReply {
-  id        String   @id @default(uuid())
-  callId    String
-  content   String
-  isChosen  Boolean  @default(false)
-  createdAt DateTime @default(now())
-
-  call Call @relation(fields: [callId], references: [id], onDelete: Cascade)
-
-  @@index([callId, createdAt])
+  @@index([contactId, createdAt])
 }
