@@ -1,5 +1,5 @@
-// src/services/summaryService.js
 const { genAI } = require("../config/env");
+const prisma = require("../db/prisma");
 
 async function summarizeCall(callSid, history, io) {
     try {
@@ -28,10 +28,21 @@ ${transcript}
         console.log("📄 통화 요약 생성 완료:\n", summary);
 
         if (callSid) {
+            await prisma.call.update({
+                where: { callSid },
+                data: {
+                    transcript,
+                    summary,
+                },
+            });
+
             io.to(callSid).emit("call.summary", { callSid, summary });
         }
+
+        return summary;
     } catch (err) {
         console.error("요약 생성 오류:", err);
+        return null;
     }
 }
 

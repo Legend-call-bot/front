@@ -1,5 +1,5 @@
-// src/routes/callRoutes.js
 const { v4: uuidv4 } = require("uuid");
+const prisma = require("../db/prisma");
 const {
     twilioClient,
     TWILIO_FROM_NUMBER,
@@ -16,7 +16,7 @@ function generateCallScript(intentText) {
 
 function registerCallRoutes(app, io) {
     // 콜 상태 콜백
-    app.post("/call-status", (req, res) => {
+    app.post("/call-status", async (req, res) => {
         const callSid = req.body.CallSid;
         const callStatus = req.body.CallStatus;
 
@@ -39,10 +39,30 @@ function registerCallRoutes(app, io) {
         res.sendStatus(200);
     });
 
+    // 설정(목소리 톤) 저장
+    app.patch("/users/:id/preferences", async (req, res) => {
+        const { id } = req.params;
+        const { preferredVoiceId } = req.body;
+
+        try {
+            const user = await prisma.user.update({
+                where: { id },
+                data: {
+                    preferredVoiceId: preferredVoiceId ?? null,
+                },
+            });
+
+            return res.json({ user });
+        } catch (err) {
+            console.error("save preferences error:", err);
+            return res.status(500).json({ error: err.message });
+        }
+    });
+
     // 발신
     app.post("/calls", async (req, res) => {
         try {
-            const { phone, intentText, voice } = req.body;
+            const { phone, intentText, voice, name, memo } = req.body;
             if (!phone || !intentText) {
                 return res
                     .status(400)
@@ -83,7 +103,35 @@ function registerCallRoutes(app, io) {
 
             console.log("📞 Call initiated:", call.sid);
 
+            // 메모리 맵 저장
             callVoiceMap.set(call.sid, effectiveVoiceId);
+
+            // DB 저장: User upsert + Call create
+            // 여기서 phoneNumber는 "내가 전화 거는 대상" 번호로 저장하는 형태
+            const user = await prisma.user.upsert({
+                where: { phoneNumber: phone },
+                create: {
+                    phoneNumber: phone,
+                    name: name || null,
+                    memo: memo || null,
+                    preferredVoiceId: effectiveVoiceId,
+                },
+                update: {
+                    name: name || undefined,
+                    memo: memo || undefined,
+                    // preferredVoiceId는 여기서 무조건 덮어쓰기 싫으면 주석 처리
+                    preferredVoiceId: effectiveVoiceId,
+                },
+            });
+
+            await prisma.call.create({
+                data: {
+                    callSid: call.sid,
+                    userId: user.id,
+                    voiceId: effectiveVoiceId,
+                    // transcript/summary는 종료 후 저장
+                },
+            });
 
             res.json({
                 callSid: call.sid,
