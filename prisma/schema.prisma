@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id               String   @id @default(uuid())
+  phoneNumber      String   @unique
+  name             String?
+  memo             String?
+  preferredVoiceId String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  calls            Call[]
+}
+
+model Call {
+  id         String   @id @default(uuid())
+  callSid    String   @unique
+  userId     String
+  voiceId    String?
+  transcript String?
+  summary    String?
+  createdAt  DateTime @default(now())
+
+  user    User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  replies SuggestedReply[]
+
+  @@index([userId, createdAt])
+}
+
+model SuggestedReply {
+  id        String   @id @default(uuid())
+  callId    String
+  content   String
+  isChosen  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  call Call @relation(fields: [callId], references: [id], onDelete: Cascade)
+
+  @@index([callId, createdAt])
+}
