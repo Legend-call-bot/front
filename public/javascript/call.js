@@ -1,3 +1,5 @@
+// call.js
+
 // ⭐ 공통 서버 주소 (ngrok 주소)
 const SERVER_URL = window.location.origin;
 
@@ -41,12 +43,17 @@ socket.on("connect_error", (err) => {
 });
 
 // ⭐ 상대방이 전화를 받으면 call_live로 이동
-socket.on("call.accepted", ({ callSid }) => {
+socket.on("call.accepted", async ({ callSid }) => {
     console.log("📞 상대방이 전화를 받음:", callSid);
 
-    window.location.href = `../pages/call_live.html?callSid=${callSid}&phone=${encodeURIComponent(
-        globalPhone
-    )}`;
+    const userId = await ensureUserId();
+
+    const phoneParam = globalPhone ? encodeURIComponent(globalPhone) : "";
+
+    window.location.href =
+        `../pages/call_live.html?callSid=${encodeURIComponent(callSid)}` +
+        `&phone=${phoneParam}` +
+        `&userId=${encodeURIComponent(userId)}`;
 });
 
 // =============================

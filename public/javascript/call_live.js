@@ -1,21 +1,30 @@
 // call_live.js
 
-// ===== callSid 가져오기 =====
+// ===== callSid, phone, userId 가져오기 =====
 const params = new URLSearchParams(window.location.search);
 const callSid = params.get("callSid");
 const phone = params.get("phone");
+const userIdFromUrl = params.get("userId");
+const userId = userIdFromUrl || localStorage.getItem("userId");
 
 if (!callSid) {
     alert("콜 정보가 없습니다.");
+}
+
+if (!userId) {
+    console.warn("⚠️ userId가 없습니다. 기본 보이스로 동작할 수 있습니다.");
 }
 
 // ===== 전화번호 표시 =====
 const phoneDisplay = document.querySelector(".phone-number");
 
 function formatKoreanPhone(number) {
-    number = number.replace(/[^0-9]/g, "");
+    number = (number || "").replace(/[^0-9]/g, "");
 
     if (number.startsWith("0")) number = number.slice(1);
+
+    // number 길이가 짧을 수도 있으니 방어 (UI 깨짐 방지)
+    if (number.length < 9) return `+82 ${number}`;
 
     return `+82 ${number.slice(0, 2)}-${number.slice(2, 6)}-${number.slice(6)}`;
 }
@@ -38,6 +47,19 @@ const sendBtn = document.getElementById("send-button");
 const inputText = document.getElementById("input-text");
 const endCallBtn = document.getElementById("endCallBtn");
 
+// ===== 통화 bind (연결 후에 바인딩) =====
+socket.on("connect", () => {
+    const payload = { callSid };
+    if (userId) payload.userId = userId;
+
+    socket.emit("bind.call", payload);
+    console.log("✅ callSid 바인딩:", callSid, "userId:", userId || "(none)");
+});
+
+socket.on("connect_error", (err) => {
+    console.error("❌ socket.io 연결 실패:", err);
+});
+
 // 👉 고정된 "다시 한 번 말씀해 주시겠어요?" 박스
 const fixedSuggestion = document.querySelector(".AI-recommended-answer.fixed");
 if (fixedSuggestion) {
@@ -45,18 +67,12 @@ if (fixedSuggestion) {
         const text = fixedSuggestion.innerText.trim();
         if (!text) return;
 
-        socket.emit("replySelected", {
-            text,
-            callSid: callSid,
-        });
+        // ✅ callSid를 보내지 않음 (서버는 바인딩된 callSid만 사용)
+        socket.emit("replySelected", { text });
 
         addMessage("나", text);
     });
 }
-
-// ===== 통화 bind =====
-socket.emit("bind.call", { callSid });
-console.log("✅ callSid 바인딩:", callSid);
 
 // ===== STT 결과 받기 =====
 socket.on("stt.final", ({ text }) => {
@@ -67,11 +83,12 @@ socket.on("stt.final", ({ text }) => {
 // ===== Gemini 추천 받기 =====
 socket.on("recommendations", ({ replies }) => {
     const container = document.getElementById("dynamic-suggestions");
+    if (!container) return;
 
     container.innerHTML = "";
 
-    const filtered = replies.filter(
-        (r) => r.trim() !== "다시 한 번 말씀해 주시겠어요?"
+    const filtered = (replies || []).filter(
+        (r) => r && r.trim() !== "다시 한 번 말씀해 주시겠어요?"
     );
 
     filtered.forEach((r) => {
@@ -80,10 +97,8 @@ socket.on("recommendations", ({ replies }) => {
         btn.className = "AI-recommended-answer dynamic";
 
         btn.onclick = () => {
-            socket.emit("replySelected", {
-                text: r,
-                callSid: callSid,
-            });
+            // ✅ callSid를 보내지 않음
+            socket.emit("replySelected", { text: r });
 
             addMessage("나", r);
         };
@@ -118,13 +133,10 @@ socket.on("call.ended.remote", ({ callSid: endedSid }) => {
     if (callSid && endedSid && callSid !== endedSid) return;
 
     if (hasSummary) {
-        // 요약 이미 저장됨 → 바로 이동
         window.location.href = "finished_call.html";
     } else {
-        // 요약 올 때까지 기다렸다가 이동
         shouldRedirect = true;
 
-        // 너무 안 오면 3초 후 강제 이동 (옵션)
         setTimeout(() => {
             if (!hasSummary) {
                 window.location.href = "finished_call.html";
@@ -134,33 +146,38 @@ socket.on("call.ended.remote", ({ callSid: endedSid }) => {
 });
 
 // ===== 채팅 입력 전송 =====
-sendBtn.addEventListener("click", () => {
-    const text = inputText.value.trim();
-    if (!text) return;
+if (sendBtn) {
+    sendBtn.addEventListener("click", () => {
+        const text = inputText ? inputText.value.trim() : "";
+        if (!text) return;
 
-    socket.emit("say", { text });
-    addMessage("나", text);
-    inputText.value = "";
-});
+        socket.emit("say", { text });
+        addMessage("나", text);
+
+        if (inputText) inputText.value = "";
+    });
+}
 
 // ===== 통화 종료 =====
-endCallBtn.addEventListener("click", () => {
-    if (!callSid) {
-        alert("콜 정보가 없습니다.");
-        return;
-    }
+if (endCallBtn) {
+    endCallBtn.addEventListener("click", () => {
+        if (!callSid) {
+            alert("콜 정보가 없습니다.");
+            return;
+        }
 
-    // 중복 클릭 방지
-    endCallBtn.disabled = true;
+        endCallBtn.disabled = true;
 
-    // 🔴 서버에 통화 종료 요청
-    socket.emit("call.ended.byUser", { callSid });
+        socket.emit("call.ended.byUser", { callSid });
 
-    console.log("통화 종료 요청 전송:", callSid);
-});
+        console.log("통화 종료 요청 전송:", callSid);
+    });
+}
 
 // ===== 채팅 출력 함수 =====
 function addMessage(sender, text) {
+    if (!chatWindow) return;
+
     const msg = document.createElement("div");
 
     if (sender === "직원") {
@@ -176,5 +193,6 @@ function addMessage(sender, text) {
 }
 
 function scrollToBottom() {
+    if (!chatWindow) return;
     chatWindow.scrollTop = chatWindow.scrollHeight;
 }
