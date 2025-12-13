@@ -53,6 +53,10 @@ const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 const callHistories = new Map();
 const callVoiceMap = new Map();
 
+// 추천 캐시, 실제 송출 문장 큐
+const callRecommendations = new Map();
+const callPlayedQueue = new Map();
+
 module.exports = {
     // env
     TWILIO_FROM_NUMBER,
@@ -71,6 +75,8 @@ module.exports = {
     // 공용 상태
     callHistories,
     callVoiceMap,
+    callRecommendations,
+    callPlayedQueue,
 
     // 프리셋용 보이스 ID
     ELEVENLABS_VOICE_ID_BRIGHT,

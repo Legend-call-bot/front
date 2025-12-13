@@ -1,9 +1,25 @@
 // src/sockets/frontendSocket.js
 const { v4: uuidv4 } = require("uuid");
-const { PUBLIC_HOST, twilioClient, callVoiceMap } = require("../config/env");
+const { PUBLIC_HOST, twilioClient, callVoiceMap, callHistories, callPlayedQueue, } = require("../config/env");
 const { synthesizeToFile } = require("../services/ttsService");
 const { playToCall } = require("../services/twilioService");
 const { resolveVoiceId } = require("../config/voice");
+
+function pushPlayedText(callSid, text) {
+    if (!callSid || !text) return;
+
+    const queue = callPlayedQueue.get(callSid) || [];
+    queue.push({ text, ts: Date.now() });
+    callPlayedQueue.set(callSid, queue.slice(-20));
+}
+
+function pushUserHistory(callSid, text) {
+    if (!callSid || !text) return;
+
+    const history = callHistories.get(callSid) || [];
+    history.push({ role: "user", content: text });
+    callHistories.set(callSid, history);
+}
 
 function initFrontendSocket(io) {
     io.on("connection", (socket) => {
@@ -16,21 +32,30 @@ function initFrontendSocket(io) {
             console.log("📌 bind.call:", callSid, "socket:", socket.id);
         });
 
+        // 추천 버튼 선택 → TTS 송출 성공 시에만 role:user 저장
         socket.on("replySelected", async ({ text, callSid }) => {
             try {
-                const filename = `${uuidv4()}.mp3`;
+                if (!callSid) return;
 
+                const filename = `${uuidv4()}.mp3`;
                 const voiceId = resolveVoiceId(null, callVoiceMap.get(callSid));
 
                 await synthesizeToFile(text, filename, voiceId);
                 const audioUrl = `${PUBLIC_HOST}/audio/${filename}`;
+
                 await playToCall(callSid, audioUrl);
+
+                // “실제로 통화로 나감” 성공 이후에만 기록
+                pushPlayedText(callSid, text);
+                pushUserHistory(callSid, text);
+
                 console.log("🔊 버튼 TTS 재생:", text);
             } catch (err) {
                 console.error("버튼 재생 오류:", err);
             }
         });
 
+        // say도 동일하게 처리
         socket.on("say", async ({ text }) => {
             try {
                 const callSid = socket.data.callSid;
@@ -38,13 +63,18 @@ function initFrontendSocket(io) {
                     socket.emit("say.error", { message: "통화 중이 아닙니다." });
                     return;
                 }
-                const filename = `${uuidv4()}.mp3`;
 
+                const filename = `${uuidv4()}.mp3`;
                 const voiceId = resolveVoiceId(null, callVoiceMap.get(callSid));
 
                 await synthesizeToFile(text, filename, voiceId);
                 const audioUrl = `${PUBLIC_HOST}/audio/${filename}`;
+
                 await playToCall(callSid, audioUrl);
+
+                pushPlayedText(callSid, text);
+                pushUserHistory(callSid, text);
+
                 socket.emit("say.result", { ok: true });
                 console.log("🔊 [say 재생 성공]:", text);
             } catch (err) {

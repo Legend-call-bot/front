@@ -5,6 +5,7 @@ const {
     AZURE_SPEECH_KEY,
     AZURE_SPEECH_REGION,
     callHistories,
+    callRecommendations,
     genAI,
 } = require("../config/env");
 const { mulawToPcm16 } = require("../utils/mulaw");
@@ -81,7 +82,6 @@ function initMediaSocket(httpServer, io) {
         // ===== 중복 인식 방지 =====
         let lastRecognizedText = "";
         let lastRecognizedTime = 0;
-        let conversationHistory = [];
 
         function isDuplicateRecognition(text) {
             const now = Date.now();
@@ -111,12 +111,11 @@ function initMediaSocket(httpServer, io) {
             if (isDuplicateRecognition(text)) return;
 
             console.log("[🎧 최종 인식 결과]", text);
-            conversationHistory.push({ role: "user", content: text });
 
             // 통화별 히스토리 저장
             if (callSid) {
                 const history = callHistories.get(callSid) || [];
-                history.push({ role: "user", content: text });
+                history.push({ role: "assistant", content: text });
                 callHistories.set(callSid, history);
             }
 
@@ -135,13 +134,9 @@ function initMediaSocket(httpServer, io) {
                     },
                 });
 
-                const historyText = conversationHistory
-                    .map(
-                        (m) =>
-                            `${m.role === "user" ? "사용자" : "AI"}: ${
-                                m.content
-                            }`
-                    )
+                const history = callSid ? callHistories.get(callSid) || [] : [];
+                const historyText = history
+                    .map((m) => `${m.role === "user" ? "나" : "직원"}: ${m.content}`)
                     .join("\n");
 
                 const result = await model.generateContent(`
@@ -150,13 +145,13 @@ function initMediaSocket(httpServer, io) {
 절대 쓸데없는 질문을 하지 마라.
 
 📌 규칙
-1. 직원이 시간/자리/인원 정보를 주면 → 질문 ❌  
+1. 직원이 시간/자리/인원 정보를 주면 → 질문 ❌
    → "그럼 6시로 부탁드립니다" 처럼 선택/결정 문장만 생성.
-2. 직원이 선택하라고 요청할 때만  
+2. 직원이 선택하라고 요청할 때만
    → 선택하는 답변만 추천 생성.
 3. 다른 추가 질문 금지.
 4. 반드시 3개 추천.
-5. 예약 확정 상황에서만  
+5. 예약 확정 상황에서만
    → "네, 알겠습니다." 사용 가능.
 
 [지금까지 대화]
@@ -186,19 +181,9 @@ ${historyText}
                 // 중복 제거
                 replies = [...new Set(replies)];
 
-                // 대화 히스토리에도 assistant로 기록
-                conversationHistory.push({
-                    role: "assistant",
-                    content: replies.join(" | "),
-                });
-
+                // 추천은 히스토리에 저장하지 않고 캐시에만 보관
                 if (callSid) {
-                    const history = callHistories.get(callSid) || [];
-                    history.push({
-                        role: "assistant",
-                        content: replies.join(" | "),
-                    });
-                    callHistories.set(callSid, history);
+                    callRecommendations.set(callSid, replies);
                 }
 
                 // 프론트로 추천 리스트 전송
