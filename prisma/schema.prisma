@@ -53,3 +53,11 @@ model Call {
   @@index([userId, createdAt])
   @@index([contactId, createdAt])
 }
+
+model UserVoiceSetting {
+    userId      String  @id
+    voicePreset String?
+    voiceId     String?
+    updatedAt   DateTime @updatedAt
+    createdAt   DateTime @default(now())
+}
