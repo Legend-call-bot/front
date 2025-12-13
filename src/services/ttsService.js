@@ -7,9 +7,11 @@ const {
     ELEVENLABS_MODEL_ID,
 } = require("../config/env");
 const { AUDIO_DIR, ensureDir } = require("../utils/audio");
-const { CURRENT_VOICE_ID } = require("../config/voice");
+const { getUserVoiceId } = require("../config/voice");
 
-async function synthesizeToFile(text, filename, voiceIdOverride) {
+async function synthesizeToFile(text, filename, options = {}) {
+    const { userId = null, voiceIdOverride = null } = options;
+
     if (!ELEVENLABS_API_KEY || !ELEVENLABS_VOICE_ID) {
         throw new Error(
             "ELEVENLABS_API_KEY 또는 ELEVENLABS_VOICE_ID가 설정되지 않았습니다."
@@ -19,7 +21,8 @@ async function synthesizeToFile(text, filename, voiceIdOverride) {
     await ensureDir(AUDIO_DIR);
     const audioFile = path.join(AUDIO_DIR, filename);
 
-    const voiceId = voiceIdOverride || CURRENT_VOICE_ID || ELEVENLABS_VOICE_ID;
+    // 다음 발화부터 적용: TTS 생성 요청 시점에 최신 voiceId를 조회해서 사용
+    const voiceId = voiceIdOverride || (await getUserVoiceId(userId)) || ELEVENLABS_VOICE_ID;
 
     const url = `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_44100_128`;
 
