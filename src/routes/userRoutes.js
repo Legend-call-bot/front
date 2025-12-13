@@ -15,8 +15,6 @@ function registerUserRoutes(app) {
                     phoneNumber: `session:${crypto.randomUUID()}`,
                     name: name || null,
                     memo: memo || null,
-
-                    preferredVoiceId: null,
                 },
                 select: { id: true },
             });
@@ -60,14 +58,7 @@ function registerUserRoutes(app) {
     app.put("/api/users/:id", async (req, res) => {
         try {
             const { id } = req.params;
-            const { name = undefined, memo = undefined, preferredVoiceId = undefined } = req.body || {};
-
-            if (preferredVoiceId !== undefined) {
-                console.warn("[USER UPDATE] preferredVoiceId is ignored. Use /api/users/:id/voice instead.", {
-                    userId: id,
-                    preferredVoiceId,
-                });
-            }
+            const { name = undefined, memo = undefined, } = req.body || {};
 
             if (name === undefined && memo === undefined) {
                 return res.status(400).json({
