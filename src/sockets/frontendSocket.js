@@ -3,7 +3,6 @@ const { v4: uuidv4 } = require("uuid");
 const {
     PUBLIC_HOST,
     twilioClient,
-    callVoiceMap,
     callHistories,
     callPlayedQueue,
 } = require("../config/env");
@@ -30,7 +29,7 @@ function initFrontendSocket(io) {
     io.on("connection", (socket) => {
         console.log("Frontend socket.io connected:", socket.id);
 
-        // callSid + userId 바인딩
+        // callSid + userId 바인딩 (SSOT=UserVoiceSetting)
         socket.on("bind.call", ({ callSid, userId }) => {
             if (!callSid) return;
 
@@ -38,35 +37,58 @@ function initFrontendSocket(io) {
             socket.data.userId = userId || null;
 
             socket.join(callSid);
-            console.log(
-                "📌 bind.call:",
+
+            console.log("📌 bind.call:", {
                 callSid,
-                "userId:",
-                socket.data.userId,
-                "socket:",
-                socket.id
-            );
+                userId: socket.data.userId,
+                socketId: socket.id,
+            });
         });
 
-        // 추천 버튼 선택 → 서버는 바인딩된 callSid만 사용
+        // 내부 유틸: 바인딩 체크
+        function getBoundContextOrWarn(eventName) {
+            const callSid = socket.data.callSid;
+            const userId = socket.data.userId || null;
+
+            if (!callSid) {
+                console.warn(`${eventName}: callSid 미바인딩 소켓`, {
+                    socketId: socket.id,
+                });
+                return null;
+            }
+
+            if (!userId) {
+                // userId가 없으면 기본 보이스로 fallback 될 수 있음 (ttsService에서 처리)
+                console.warn(`${eventName}: userId 없음(기본 보이스 fallback 가능)`, {
+                    callSid,
+                    socketId: socket.id,
+                });
+            }
+
+            return { callSid, userId };
+        }
+
+        // 추천 버튼 선택
         socket.on("replySelected", async ({ text }) => {
+            const ctx = getBoundContextOrWarn("replySelected");
+            if (!ctx) return;
+
+            const { callSid, userId } = ctx;
+
+            if (!text) return;
+
             try {
-                const callSid = socket.data.callSid;
-                if (!callSid) {
-                    console.warn("replySelected: callSid 미바인딩 소켓:", socket.id);
-                    return;
-                }
-
-                if (!text) return;
-
                 const filename = `${uuidv4()}.mp3`;
 
-                // 기본: userId 기반으로 DB에서 최신 보이스 조회
-                // fallback: callVoiceMap에 값이 있으면 override로 사용(기존 호환)
-                const userId = socket.data.userId || null;
-                const voiceIdOverride = callVoiceMap.get(callSid) || null;
+                console.log("[TTS] replySelected:", {
+                    callSid,
+                    userId,
+                    filename,
+                    textPreview: text.slice(0, 30),
+                });
 
-                await synthesizeToFile(text, filename, { userId, voiceIdOverride });
+                // SSOT 기반: userId로 최신 보이스 조회 (ttsService 내부에서 getUserVoiceId)
+                await synthesizeToFile(text, filename, { userId, callSid });
 
                 const audioUrl = `${PUBLIC_HOST}/audio/${filename}`;
                 await playToCall(callSid, audioUrl);
@@ -74,32 +96,38 @@ function initFrontendSocket(io) {
                 pushPlayedText(callSid, text);
                 pushUserHistory(callSid, text);
 
-                console.log("🔊 버튼 TTS 재생:", text);
+                console.log("🔊 replySelected 재생 성공:", { callSid, filename });
             } catch (err) {
-                console.error("버튼 재생 오류:", err);
+                console.error("replySelected 재생 오류:", err);
             }
         });
 
-        // say도 동일하게 처리
+        // 채팅 입력 say
         socket.on("say", async ({ text }) => {
+            const ctx = getBoundContextOrWarn("say");
+            if (!ctx) {
+                socket.emit("say.error", { message: "통화 중이 아닙니다." });
+                return;
+            }
+
+            const { callSid, userId } = ctx;
+
+            if (!text) {
+                socket.emit("say.error", { message: "텍스트가 비어 있습니다." });
+                return;
+            }
+
             try {
-                const callSid = socket.data.callSid;
-                if (!callSid) {
-                    socket.emit("say.error", { message: "통화 중이 아닙니다." });
-                    return;
-                }
-
-                if (!text) {
-                    socket.emit("say.error", { message: "텍스트가 비어 있습니다." });
-                    return;
-                }
-
                 const filename = `${uuidv4()}.mp3`;
 
-                const userId = socket.data.userId || null;
-                const voiceIdOverride = callVoiceMap.get(callSid) || null;
+                console.log("[TTS] say:", {
+                    callSid,
+                    userId,
+                    filename,
+                    textPreview: text.slice(0, 30),
+                });
 
-                await synthesizeToFile(text, filename, { userId, voiceIdOverride });
+                await synthesizeToFile(text, filename, { userId, callSid });
 
                 const audioUrl = `${PUBLIC_HOST}/audio/${filename}`;
                 await playToCall(callSid, audioUrl);
@@ -108,14 +136,16 @@ function initFrontendSocket(io) {
                 pushUserHistory(callSid, text);
 
                 socket.emit("say.result", { ok: true });
-                console.log("🔊 [say 재생 성공]:", text);
+                console.log("🔊 say 재생 성공:", { callSid, filename });
             } catch (err) {
                 socket.emit("say.error", { message: err.message });
             }
         });
 
+        // 통화 종료
         socket.on("call.ended.byUser", async ({ callSid }) => {
             console.log("📴 사용자 측 통화 종료 요청:", callSid);
+
             if (!callSid) {
                 console.warn("callSid가 없어 통화 종료 요청을 처리할 수 없습니다.");
                 return;

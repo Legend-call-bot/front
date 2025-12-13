@@ -87,51 +87,6 @@
                             완료
                         </button>
                     </form>
-
-                    <script>
-                        // 폼 제출(완료 버튼)
-                        document
-                            .getElementById("settingsForm")
-                            .addEventListener("submit", function (e) {
-                                e.preventDefault();
-
-                                const form = e.target;
-                                const voice = form.voice.value;
-                                const speed = form.speed.value;
-
-                                // TODO: TTS 프리셋 저장 (localStorage 또는 서버 API 호출)
-                                // 예: saveTtsPreset({ voice, speed });
-
-                                window.location.href = "call.html";
-                            });
-
-                        // 미리듣기 버튼
-                        document
-                            .querySelector(".preview-btn")
-                            .addEventListener("click", async function () {
-                                const form =
-                                    document.getElementById("settingsForm");
-                                const voice = form.voice.value; // friendly_female 등
-                                const speed = form.speed.value;
-
-                                const res = await fetch("/tts-preview", {
-                                    method: "POST",
-                                    headers: {
-                                        "Content-Type": "application/json",
-                                    },
-                                    body: JSON.stringify({ voice, speed }),
-                                });
-
-                                const data = await res.json();
-                                if (!data.audioUrl) {
-                                    alert("TTS 미리듣기 생성에 실패했습니다.");
-                                    return;
-                                }
-
-                                const audio = new Audio(data.audioUrl);
-                                audio.play();
-                            });
-                    </script>
                 </section>
             </main>
 
@@ -145,5 +100,6 @@
                 </a>
             </div>
         </div>
+        <script src="../javascript/settings.js"></script>
     </body>
 </html>

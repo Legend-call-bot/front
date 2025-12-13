@@ -51,7 +51,6 @@ const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
 // 통화별 저장소
 const callHistories = new Map();
-const callVoiceMap = new Map();
 
 // 추천 캐시, 실제 송출 문장 큐
 const callRecommendations = new Map();
@@ -74,7 +73,6 @@ module.exports = {
 
     // 공용 상태
     callHistories,
-    callVoiceMap,
     callRecommendations,
     callPlayedQueue,
 

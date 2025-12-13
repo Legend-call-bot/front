@@ -6,13 +6,30 @@ const {
     TWILIO_FROM_NUMBER,
     PUBLIC_HOST,
     callHistories,
-    callVoiceMap,
 } = require("../config/env");
-const { resolveVoiceId } = require("../config/voice");
+const { getUserVoiceId } = require("../config/voice");
 const { synthesizeToFile } = require("../services/ttsService");
 
 function generateCallScript(intentText) {
     return `안녕하세요. 고객님을 대신해 간단히 문의드립니다. ${intentText}. 가능/불가능만 알려주시면 감사하겠습니다.`;
+}
+
+function normalizeToE164KR(phone) {
+    let digits = String(phone || "").replace(/[^0-9]/g, "");
+
+    if (!digits) {
+        throw new Error("phone is required");
+    }
+
+    if (digits.startsWith("82")) {
+        digits = digits.slice(2);
+    }
+
+    if (digits.startsWith("0")) {
+        digits = digits.slice(1);
+    }
+
+    return `+82${digits}`;
 }
 
 function registerCallRoutes(app, io) {
@@ -33,37 +50,16 @@ function registerCallRoutes(app, io) {
             io.to(callSid).emit("call.ended.remote", { callSid });
 
             callHistories.delete(callSid);
-            callVoiceMap.delete(callSid);
         }
 
         res.sendStatus(200);
-    });
-
-    // 설정(목소리 톤) 저장
-    app.patch("/users/:id/preferences", async (req, res) => {
-        const { id } = req.params;
-        const { preferredVoiceId } = req.body;
-
-        try {
-            const user = await prisma.user.update({
-                where: { id },
-                data: {
-                    preferredVoiceId: preferredVoiceId ?? null,
-                },
-            });
-
-            return res.json({ user });
-        } catch (err) {
-            console.error("save preferences error:", err);
-            return res.status(500).json({ error: err.message });
-        }
     });
 
     // 발신 (userId(앱 사용자) + contact(상대방))
     app.post("/calls", async (req, res) => {
         try {
             const { userId, phone, intentText, voice, contactName, contactMemo } =
-                req.body;
+                req.body || {};
 
             if (!userId || !phone || !intentText) {
                 return res.status(400).json({
@@ -71,23 +67,18 @@ function registerCallRoutes(app, io) {
                 });
             }
 
-            // 1) 앱 사용자 확인
+            // 1) 앱 사용자 존재 확인
             const user = await prisma.user.findUnique({
                 where: { id: userId },
-                select: { id: true, preferredVoiceId: true },
+                select: { id: true },
             });
 
             if (!user) {
                 return res.status(404).json({ error: "user not found" });
             }
 
-            // 2) 상대방 번호 정규화 (DB 저장용은 원본 phone 유지 가능, twilio용은 e164)
-            let e164Phone = phone.replace(/[^0-9]/g, "");
-            if (e164Phone.startsWith("0")) {
-                e164Phone = e164Phone.slice(1);
-            }
-            e164Phone = "+82" + e164Phone;
-
+            // 2) 상대방 번호 정규화
+            const e164Phone = normalizeToE164KR(phone);
             console.log("📞 변환된 Twilio 전화번호:", e164Phone);
 
             // 3) Contact upsert (userId + phone 유니크)
@@ -111,13 +102,18 @@ function registerCallRoutes(app, io) {
                 select: { id: true },
             });
 
-            // 4) voice 결정: 요청 voice가 있으면 우선, 없으면 user.preferredVoiceId
-            const effectiveVoiceId = resolveVoiceId(voice ?? user.preferredVoiceId);
-
+            // 4) 통화 시작 스크립트 TTS 생성
+            // - voice(프론트에서 넘어오는 값)가 있으면 presetKey로 즉시 적용(선택)
+            // - 없으면 userId 기반으로 DB에서 최신 보이스 적용
             const script = generateCallScript(intentText);
             const filename = `${uuidv4()}.mp3`;
 
-            await synthesizeToFile(script, filename, effectiveVoiceId);
+            await synthesizeToFile(script, filename, {
+                userId,
+                presetKey: voice || null,
+                callSid: null,
+            });
+
             const audioUrl = `${PUBLIC_HOST}/audio/${filename}`;
 
             // 5) Twilio 발신
@@ -139,16 +135,16 @@ function registerCallRoutes(app, io) {
 
             console.log("📞 Call initiated:", call.sid);
 
-            // 6) 메모리 맵 저장
-            callVoiceMap.set(call.sid, effectiveVoiceId);
+            // 6) DB 저장: Call 생성 (앱 사용자 + 상대방)
+            // Call.voiceId에는 실제 ElevenLabs voice_id를 저장(추적용)
+            const resolvedVoiceId = await getUserVoiceId(userId);
 
-            // 7) DB 저장: Call 생성 (앱 사용자 + 상대방)
             await prisma.call.create({
                 data: {
                     callSid: call.sid,
                     userId: userId,
                     contactId: contact.id,
-                    voiceId: effectiveVoiceId,
+                    voiceId: resolvedVoiceId,
                 },
             });
 
@@ -156,7 +152,7 @@ function registerCallRoutes(app, io) {
                 callSid: call.sid,
                 script,
                 audioUrl,
-                voiceId: effectiveVoiceId,
+                voiceId: resolvedVoiceId,
             });
         } catch (err) {
             console.error(err);
@@ -164,19 +160,22 @@ function registerCallRoutes(app, io) {
         }
     });
 
-    // TTS 프리뷰
+    // TTS 프리뷰 (프리셋 키 기반)
     app.post("/tts-preview", async (req, res) => {
         try {
-            const { voice } = req.body;
+            const { voice } = req.body || {};
 
-            const voiceId = resolveVoiceId(voice);
             const sampleText = "안녕하세요. 이렇게 들립니다.";
             const filename = `preview-${uuidv4()}.mp3`;
 
-            await synthesizeToFile(sampleText, filename, voiceId);
-            const audioUrl = `${PUBLIC_HOST}/audio/${filename}`;
+            await synthesizeToFile(sampleText, filename, {
+                presetKey: voice || null,
+                userId: null,
+                callSid: null,
+            });
 
-            res.json({ audioUrl, voiceId });
+            const audioUrl = `${PUBLIC_HOST}/audio/${filename}`;
+            res.json({ audioUrl });
         } catch (err) {
             console.error("TTS preview error:", err);
             res.status(500).json({ error: err.message });

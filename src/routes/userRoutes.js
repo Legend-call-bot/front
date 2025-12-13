@@ -7,7 +7,7 @@ function registerUserRoutes(app) {
     // 로그인 없이 userId 발급 (세션 사용자)
     app.post("/api/users/session", async (req, res) => {
         try {
-            const { name, memo, preferredVoiceId } = req.body || {};
+            const { name, memo } = req.body || {};
 
             const user = await prisma.user.create({
                 data: {
@@ -15,18 +15,11 @@ function registerUserRoutes(app) {
                     phoneNumber: `session:${crypto.randomUUID()}`,
                     name: name || null,
                     memo: memo || null,
-                    preferredVoiceId: preferredVoiceId || null,
+
+                    preferredVoiceId: null,
                 },
                 select: { id: true },
             });
-
-            // 기존 preferredVoiceId를 새 UserVoiceSetting(SSOT=DB)에 반영
-            if (preferredVoiceId) {
-                await setUserVoiceSetting(user.id, {
-                    presetKey: null,
-                    voiceId: preferredVoiceId,
-                });
-            }
 
             return res.status(201).json({ userId: user.id });
         } catch (err) {
@@ -35,13 +28,21 @@ function registerUserRoutes(app) {
         }
     });
 
-    // 유저 프로필 조회(선택)
+    // 유저 프로필 조회(선택) - 보이스 관련 필드는 다루지 않음
     app.get("/api/users/:id", async (req, res) => {
         try {
             const { id } = req.params;
 
             const user = await prisma.user.findUnique({
                 where: { id },
+                select: {
+                    id: true,
+                    phoneNumber: true,
+                    name: true,
+                    memo: true,
+                    createdAt: true,
+                    updatedAt: true,
+                },
             });
 
             if (!user) {
@@ -55,8 +56,58 @@ function registerUserRoutes(app) {
         }
     });
 
-    // 사용자 보이스 설정 조회 (SSOT=UserVoiceSetting)
-    // 응답: { voiceId, presetKey }
+    // 유저 프로필 수정
+    app.put("/api/users/:id", async (req, res) => {
+        try {
+            const { id } = req.params;
+            const { name = undefined, memo = undefined, preferredVoiceId = undefined } = req.body || {};
+
+            if (preferredVoiceId !== undefined) {
+                console.warn("[USER UPDATE] preferredVoiceId is ignored. Use /api/users/:id/voice instead.", {
+                    userId: id,
+                    preferredVoiceId,
+                });
+            }
+
+            if (name === undefined && memo === undefined) {
+                return res.status(400).json({
+                    error: "no updatable fields (name, memo)",
+                });
+            }
+
+            const exists = await prisma.user.findUnique({
+                where: { id },
+                select: { id: true },
+            });
+
+            if (!exists) {
+                return res.status(404).json({ error: "user not found" });
+            }
+
+            const updatedUser = await prisma.user.update({
+                where: { id },
+                data: {
+                    ...(name !== undefined ? { name: name || null } : {}),
+                    ...(memo !== undefined ? { memo: memo || null } : {}),
+                },
+                select: {
+                    id: true,
+                    phoneNumber: true,
+                    name: true,
+                    memo: true,
+                    createdAt: true,
+                    updatedAt: true,
+                },
+            });
+
+            return res.json({ user: updatedUser });
+        } catch (err) {
+            console.error("update user error:", err);
+            return res.status(500).json({ error: err.message });
+        }
+    });
+
+    // 사용자 보이스 설정 조회
     app.get("/api/users/:id/voice", async (req, res) => {
         try {
             const { id } = req.params;
@@ -82,8 +133,6 @@ function registerUserRoutes(app) {
     });
 
     // 사용자 보이스 설정 저장/변경
-    // body: { presetKey?: string, voiceId?: string }
-    // 응답: { voiceId, presetKey }
     app.put("/api/users/:id/voice", async (req, res) => {
         try {
             const { id } = req.params;
@@ -95,17 +144,8 @@ function registerUserRoutes(app) {
                 });
             }
 
+            // UserVoiceSetting만 갱신 (User 테이블에는 동기화하지 않음)
             await setUserVoiceSetting(id, { presetKey, voiceId });
-
-            // (선택) 기존 User 테이블의 preferredVoiceId도 동기화하고 싶다면 유지
-            // - presetKey만 온 경우엔 실제 voiceId를 resolve해야 하는데,
-            //   여기서는 간단히 voiceId가 있을 때만 업데이트
-            if (voiceId) {
-                await prisma.user.update({
-                    where: { id },
-                    data: { preferredVoiceId: voiceId },
-                });
-            }
 
             const saved = await prisma.userVoiceSetting.findUnique({
                 where: { userId: id },
