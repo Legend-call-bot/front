@@ -146,17 +146,31 @@ socket.on("call.ended.remote", ({ callSid: endedSid }) => {
 });
 
 // ===== 채팅 입력 전송 =====
+function sendChatMessage() {
+    const text = inputText ? inputText.value.trim() : "";
+    if (!text) return;
+
+    socket.emit("say", { text });
+    addMessage("나", text);
+
+    if (inputText) inputText.value = "";
+}
+
 if (sendBtn) {
     sendBtn.addEventListener("click", () => {
-        const text = inputText ? inputText.value.trim() : "";
-        if (!text) return;
-
-        socket.emit("say", { text });
-        addMessage("나", text);
-
-        if (inputText) inputText.value = "";
+        sendChatMessage();
     });
 }
+
+if (inputText) {
+    inputText.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+            e.preventDefault(); // (폼 submit/개행 방지)
+            sendChatMessage();
+        }
+    });
+}
+
 
 // ===== 통화 종료 =====
 if (endCallBtn) {
