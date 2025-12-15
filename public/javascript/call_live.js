@@ -15,7 +15,9 @@ if (!callSid) {
 // ===== 로그인 유저 우선으로 userId 확정 =====
 async function resolveUserId() {
     try {
-        const res = await fetch(`${SERVER_URL}/api/me`, { credentials: "include" });
+        const res = await fetch(`${SERVER_URL}/api/me`, {
+            credentials: "include",
+        });
 
         if (res.ok) {
             const data = await res.json();
@@ -85,7 +87,12 @@ function initSocket() {
         if (userId) payload.userId = userId;
 
         socket.emit("bind.call", payload);
-        console.log("✅ callSid 바인딩:", callSid, "userId:", userId || "(none)");
+        console.log(
+            "✅ callSid 바인딩:",
+            callSid,
+            "userId:",
+            userId || "(none)"
+        );
     });
 
     socket.on("connect_error", (err) => {
@@ -93,7 +100,9 @@ function initSocket() {
     });
 
     // 👉 고정된 "다시 한 번 말씀해 주시겠어요?" 박스
-    const fixedSuggestion = document.querySelector(".AI-recommended-answer.fixed");
+    const fixedSuggestion = document.querySelector(
+        ".AI-recommended-answer.fixed"
+    );
     if (fixedSuggestion) {
         fixedSuggestion.addEventListener("click", () => {
             const text = fixedSuggestion.innerText.trim();
@@ -174,27 +183,63 @@ function initSocket() {
 // ===== 채팅 입력 전송 =====
 function sendChatMessage() {
     const text = inputText ? inputText.value.trim() : "";
-    if (!text) return;
+    if (!text) return false;
 
-    if (!socket) return;
+    if (!socket) return false;
 
     socket.emit("say", { text });
     addMessage("나", text);
 
-    if (inputText) inputText.value = "";
+    if (inputText) {
+        inputText.value = "";
+        inputText.blur();
+        inputText.focus();
+    }
+    return true;
+}
+
+let isSending = false;
+
+function sendChatMessageOnce() {
+    if (isSending) return;
+
+    const sent = sendChatMessage();
+    if (!sent) return;
+
+    isSending = true;
+
+    setTimeout(() => {
+        isSending = false;
+    }, 200);
 }
 
 if (sendBtn) {
     sendBtn.addEventListener("click", () => {
-        sendChatMessage();
+        sendChatMessageOnce();
     });
 }
 
+let isComposing = false;
+
 if (inputText) {
+    inputText.addEventListener("compositionstart", () => {
+        isComposing = true;
+    });
+
+    inputText.addEventListener("compositionend", () => {
+        isComposing = false;
+    });
+
     inputText.addEventListener("keydown", (e) => {
+        // 한글 조합 중 Enter는 "확정" 동작이라 전송하면 꼬임
+        if (isComposing) return;
+
         if (e.key === "Enter") {
             e.preventDefault();
-            sendChatMessage();
+            e.stopPropagation();
+            if (e.repeat) return;
+
+            sendChatMessageOnce();
         }
     });
 }
