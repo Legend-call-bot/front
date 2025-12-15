@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>for call phobia - Home</title>
+
+        <!-- 공통 스타일(상속) -->
+        <link rel="stylesheet" href="../css/style.css" />
+        <!-- home 전용 -->
+        <link rel="stylesheet" href="../css/home.css" />
+    </head>
+    <body>
+        <div class="container">
+            <div class="header-box">
+                <h1><a href="call.html">for call phobia</a></h1>
+            </div>
+
+            <main class="login-box">
+                <h2 class="second-title">for call phobia</h2>
+
+                <button
+                    type="button"
+                    class="google-login-button"
+                    id="googleLoginBtn"
+                >
+                    <img
+                        class="google-icon"
+                        src="./images/google-logo.png"
+                        alt="Google"
+                    />oogle로 로그인
+                </button>
+            </main>
+
+            <div class="footer">
+                <p>
+                    <a href="terms_of_service_and_privacy_policy.html"
+                        >약관 | 개인정보 처리 방침</a
+                    >
+                </p>
+            </div>
+        </div>
+
+        <script>
+            document
+                .getElementById("googleLoginBtn")
+                .addEventListener("click", () => {
+                    window.location.href = "/auth/google";
+                });
+        </script>
+    </body>
+</html>
