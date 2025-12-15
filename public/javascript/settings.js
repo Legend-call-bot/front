@@ -2,17 +2,41 @@
 
 const SERVER_URL = window.location.origin;
 
-function getUserIdFromUrlOrStorage() {
-    const params = new URLSearchParams(window.location.search);
-    const userIdFromUrl = params.get("userId");
-    return userIdFromUrl || localStorage.getItem("userId");
-}
+const VOICE_PRESETS = new Set([
+    "friendly_female",
+    "firm_female",
+    "calm_female",
+    "warm_female",
+]);
 
 function resetUserId() {
     localStorage.removeItem("userId");
 }
 
+async function getLoggedInUserId() {
+    try {
+        const res = await fetch(`${SERVER_URL}/api/me`, {
+            credentials: "include",
+        });
+
+        if (!res.ok) return null;
+
+        const data = await res.json().catch(() => ({}));
+        return data && data.user && data.user.id ? data.user.id : null;
+    } catch (e) {
+        return null;
+    }
+}
+
 async function ensureUserId() {
+    // 1) 구글 로그인 유저면 항상 이 ID 사용
+    const loggedInUserId = await getLoggedInUserId();
+    if (loggedInUserId) {
+        localStorage.setItem("userId", loggedInUserId);
+        return loggedInUserId;
+    }
+
+    // 2) (선택) 비로그인 사용 시: 기존 session userId 사용/발급
     let userId = localStorage.getItem("userId");
     if (userId) return userId;
 
@@ -32,17 +56,14 @@ async function ensureUserId() {
     return data.userId;
 }
 
-const VOICE_PRESETS = new Set([
-    "friendly_female",
-    "firm_female",
-    "calm_female",
-    "warm_female",
-]);
-
 async function fetchUserVoiceSetting(userId) {
     const res = await fetch(
-        `${SERVER_URL}/api/users/${encodeURIComponent(userId)}/voice`
+        `${SERVER_URL}/api/users/${encodeURIComponent(userId)}/voice`,
+        {
+            credentials: "include",
+        }
     );
+
     const data = await res.json().catch(() => ({}));
 
     if (res.status === 404) {
@@ -56,7 +77,6 @@ async function fetchUserVoiceSetting(userId) {
         throw new Error(data.error || "보이스 설정 조회 실패");
     }
 
-    // 서버 응답: { voiceId, presetKey }
     return {
         presetKey: data.presetKey || null,
         voiceId: data.voiceId || null,
@@ -68,6 +88,7 @@ async function updateUserVoiceSetting(userId, payload) {
         `${SERVER_URL}/api/users/${encodeURIComponent(userId)}/voice`,
         {
             method: "PUT",
+            credentials: "include",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),
         }
@@ -76,7 +97,6 @@ async function updateUserVoiceSetting(userId, payload) {
     const data = await res.json().catch(() => ({}));
 
     if (res.status === 404) {
-        // DB에서 유저가 삭제된 상태면 자동 복구 후 재시도
         resetUserId();
         const newUserId = await ensureUserId();
         return updateUserVoiceSetting(newUserId, payload);
@@ -92,12 +112,10 @@ async function updateUserVoiceSetting(userId, payload) {
 function applySettingToForm(form, setting) {
     const presetKey = setting?.presetKey || null;
 
-    // presetKey가 유효하면 그대로 설정
     if (presetKey && VOICE_PRESETS.has(presetKey) && form.voice) {
         form.voice.value = presetKey;
     }
 
-    // speed는 로컬 저장 유지 (현재 서버에 speed 저장 안함)
     const savedSpeed = localStorage.getItem("ttsSpeed");
     if (savedSpeed && form.speed) {
         form.speed.value = savedSpeed;
@@ -113,20 +131,14 @@ window.addEventListener("DOMContentLoaded", async () => {
 
     if (!form) return;
 
-    // 초기에는 막고 시작
     if (submitBtn) submitBtn.disabled = true;
     if (previewBtn) previewBtn.disabled = true;
 
     try {
-        // userId 확보(없으면 발급)
-        let userId = getUserIdFromUrlOrStorage();
-        if (!userId) {
-            userId = await ensureUserId();
-        } else {
-            localStorage.setItem("userId", userId);
-        }
+        // 로그인 유저 우선으로 userId 확정
+        const userId = await ensureUserId();
 
-        // 서버 값 로드(404면 자동 복구됨)
+        // 서버 값 로드
         try {
             const setting = await fetchUserVoiceSetting(userId);
             applySettingToForm(form, setting);
@@ -134,7 +146,7 @@ window.addEventListener("DOMContentLoaded", async () => {
             console.warn("보이스 설정 조회 실패(기본값 유지):", e);
         }
 
-        // 완료(저장)
+        // 저장
         form.addEventListener("submit", async (e) => {
             e.preventDefault();
             if (submitBtn) submitBtn.disabled = true;
@@ -150,8 +162,8 @@ window.addEventListener("DOMContentLoaded", async () => {
                     return;
                 }
 
-                const currentUserId =
-                    localStorage.getItem("userId") || (await ensureUserId());
+                // 저장 시에도 로그인 유저 우선
+                const currentUserId = await ensureUserId();
 
                 await updateUserVoiceSetting(currentUserId, { presetKey });
 
@@ -182,9 +194,7 @@ window.addEventListener("DOMContentLoaded", async () => {
                     const data = await res.json().catch(() => ({}));
 
                     if (!res.ok || !data.audioUrl) {
-                        throw new Error(
-                            data.error || "TTS 미리듣기 생성 실패"
-                        );
+                        throw new Error(data.error || "TTS 미리듣기 생성 실패");
                     }
 
                     const audio = new Audio(data.audioUrl);
@@ -201,7 +211,6 @@ window.addEventListener("DOMContentLoaded", async () => {
         console.error("settings 초기화 실패:", err);
         alert(err.message || "설정 초기화 실패");
     } finally {
-        // 초기화 끝나면 풀기
         if (submitBtn) submitBtn.disabled = false;
         if (previewBtn) previewBtn.disabled = false;
     }

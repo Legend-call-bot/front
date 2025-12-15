@@ -3,15 +3,35 @@
 // ⭐ 공통 서버 주소 (ngrok 주소)
 const SERVER_URL = window.location.origin;
 
+async function getLoggedInUserId() {
+    try {
+        const res = await fetch(`${SERVER_URL}/api/me`, {
+            credentials: "include",
+        });
+        if (!res.ok) return null;
+
+        const data = await res.json();
+        return data && data.user && data.user.id ? data.user.id : null;
+    } catch (e) {
+        return null;
+    }
+}
+
 async function ensureUserId() {
+    // 1) 구글 로그인 유저면 그 id를 최우선으로 사용
+    const loggedInUserId = await getLoggedInUserId();
+    if (loggedInUserId) {
+        localStorage.setItem("userId", loggedInUserId);
+        return loggedInUserId;
+    }
+
+    // 2) 비로그인이면 기존 세션 userId 사용/발급
     let userId = localStorage.getItem("userId");
     if (userId) return userId;
 
     const res = await fetch(`${SERVER_URL}/api/users/session`, {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({}),
     });
 
