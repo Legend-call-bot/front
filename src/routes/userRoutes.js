@@ -198,6 +198,75 @@ function registerUserRoutes(app) {
             return res.status(500).json({ error: err.message });
         }
     });
+
+    // 연락처 생성
+    app.post("/api/users/:id/contacts", async (req, res) => {
+        try {
+            const { id: userId } = req.params;
+            const { name = null, phoneNumber, memo = null } = req.body || {};
+
+            if (!phoneNumber) {
+                return res
+                    .status(400)
+                    .json({ error: "phoneNumber is required" });
+            }
+
+            const normalizedPhoneNumber = String(phoneNumber).trim();
+
+            const created = await prisma.contact.create({
+                data: {
+                    userId,
+                    phoneNumber: normalizedPhoneNumber,
+                    name: name ? String(name).trim() : null,
+                    memo: memo ? String(memo).trim() : null,
+                },
+                select: {
+                    id: true,
+                    userId: true,
+                    phoneNumber: true,
+                    name: true,
+                    memo: true,
+                    createdAt: true,
+                },
+            });
+
+            return res.status(201).json({ contact: created });
+        } catch (err) {
+            // userId + phoneNumber unique 충돌
+            if (err.code === "P2002") {
+                return res
+                    .status(409)
+                    .json({ error: "이미 등록된 전화번호입니다." });
+            }
+
+            console.error("create contact error:", err);
+            return res.status(500).json({ error: err.message });
+        }
+    });
+
+    // 연락처 목록 조회
+    app.get("/api/users/:id/contacts", async (req, res) => {
+        try {
+            const { id: userId } = req.params;
+
+            const contacts = await prisma.contact.findMany({
+                where: { userId },
+                orderBy: { createdAt: "desc" },
+                select: {
+                    id: true,
+                    phoneNumber: true,
+                    name: true,
+                    memo: true,
+                    createdAt: true,
+                },
+            });
+
+            return res.json({ contacts });
+        } catch (err) {
+            console.error("list contacts error:", err);
+            return res.status(500).json({ error: err.message });
+        }
+    });
 }
 
 module.exports = registerUserRoutes;

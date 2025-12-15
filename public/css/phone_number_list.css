@@ -206,7 +206,8 @@
     color: #000000;
 }
 
-.pn-icon-btn img {
+/* SVG 대상 */
+.pn-icon-btn .pn-icon-svg {
     width: 30px;
     height: 30px;
     display: block;
@@ -234,6 +235,7 @@
     flex: 0 0 370px;
 }
 
+/* 즐겨찾기 별 활성화 */
 .pn-icon-btn--star.is-active .pn-icon-svg path {
     stroke: #000000;
     fill: #4f46e5;
