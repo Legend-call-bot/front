@@ -117,3 +117,12 @@ callButton.addEventListener("click", async () => {
 window.addEventListener("DOMContentLoaded", () => {
     ensureUserId().catch(console.error);
 });
+
+async function requireLogin() {
+    const res = await fetch("/api/me", { credentials: "include" });
+    if (!res.ok) {
+        window.location.replace("/pages/home.html");
+    }
+}
+
+requireLogin();

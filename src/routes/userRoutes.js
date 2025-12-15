@@ -12,7 +12,7 @@ function registerUserRoutes(app) {
             const user = await prisma.user.create({
                 data: {
                     // 현재 스키마가 phoneNumber @unique라 임시 유니크 값 필요
-                    phoneNumber: `session:${crypto.randomUUID()}`,
+                    phoneNumber: null,
                     name: name || null,
                     memo: memo || null,
                 },
