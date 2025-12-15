@@ -18,7 +18,7 @@ function registerUserRoutes(app) {
                 },
                 select: { id: true },
             });
-
+            req.session.userId = user.id;
             return res.status(201).json({ userId: user.id });
         } catch (err) {
             console.error("create session user error:", err);
@@ -58,7 +58,7 @@ function registerUserRoutes(app) {
     app.put("/api/users/:id", async (req, res) => {
         try {
             const { id } = req.params;
-            const { name = undefined, memo = undefined, } = req.body || {};
+            const { name = undefined, memo = undefined } = req.body || {};
 
             if (name === undefined && memo === undefined) {
                 return res.status(400).json({
@@ -94,6 +94,47 @@ function registerUserRoutes(app) {
             return res.json({ user: updatedUser });
         } catch (err) {
             console.error("update user error:", err);
+            return res.status(500).json({ error: err.message });
+        }
+    });
+
+    // 현재 세션 기준 내 정보 조회
+    app.get("/api/users/me", async (req, res) => {
+        try {
+            // passport 로그인(구글 OAuth) 케이스
+            if (req.user?.id) {
+                const user = await prisma.user.findUnique({
+                    where: { id: req.user.id },
+                    select: { id: true, name: true, email: true },
+                });
+
+                if (!user) {
+                    return res.status(404).json({ error: "user not found" });
+                }
+
+                return res.json({ user });
+            }
+
+            // "로그인 없이 session userId 발급" 케이스를 위해
+            // (session에 userId를 저장해두는 방식이면 아래처럼)
+            const sessionUserId = req.session?.userId;
+
+            if (!sessionUserId) {
+                return res.status(401).json({ error: "not logged in" });
+            }
+
+            const user = await prisma.user.findUnique({
+                where: { id: sessionUserId },
+                select: { id: true, name: true },
+            });
+
+            if (!user) {
+                return res.status(404).json({ error: "user not found" });
+            }
+
+            return res.json({ user });
+        } catch (err) {
+            console.error("get me error:", err);
             return res.status(500).json({ error: err.message });
         }
     });

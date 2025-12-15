@@ -45,6 +45,33 @@ async function ensureUserId() {
     return data.userId;
 }
 
+async function renderUserName() {
+    try {
+        // 1) 로그인 유저면 /api/me에서
+        const meRes = await fetch(`${SERVER_URL}/api/me`, { credentials: "include" });
+        if (meRes.ok) {
+            const data = await meRes.json();
+            const name = data?.user?.name || data?.user?.email || "사용자";
+            const el = document.getElementById("userName");
+            if (el) el.textContent = name;
+            return;
+        }
+
+        // 2) 비로그인이면 session userId 기반으로 /api/users/:id에서
+        const userId = await ensureUserId();
+        const userRes = await fetch(`${SERVER_URL}/api/users/${encodeURIComponent(userId)}`);
+        if (!userRes.ok) return;
+
+        const userData = await userRes.json();
+        const name = userData?.user?.name || "사용자";
+
+        const el = document.getElementById("userName");
+        if (el) el.textContent = name;
+    } catch (e) {}
+}
+
+document.addEventListener("DOMContentLoaded", renderUserName);
+
 // ⭐ 저장용 전역 변수
 let globalPhone = null;
 
