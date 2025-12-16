@@ -11,15 +11,24 @@ function registerUserRoutes(app) {
 
             const user = await prisma.user.create({
                 data: {
-                    // 현재 스키마가 phoneNumber @unique라 임시 유니크 값 필요
                     phoneNumber: null,
                     name: name || null,
                     memo: memo || null,
                 },
                 select: { id: true },
             });
+
             req.session.userId = user.id;
-            return res.status(201).json({ userId: user.id });
+
+            req.session.save((err) => {
+                if (err) {
+                    console.error("session save error:", err);
+                    return res
+                        .status(500)
+                        .json({ error: "session save failed" });
+                }
+                return res.status(201).json({ userId: user.id });
+            });
         } catch (err) {
             console.error("create session user error:", err);
             return res.status(500).json({ error: err.message });
