@@ -58,8 +58,14 @@ function registerCallRoutes(app, io) {
     // 발신 (userId(앱 사용자) + contact(상대방))
     app.post("/calls", async (req, res) => {
         try {
-            const { userId, phone, intentText, voice, contactName, contactMemo } =
-                req.body || {};
+            const {
+                userId,
+                phone,
+                intentText,
+                voice,
+                contactName,
+                contactMemo,
+            } = req.body || {};
 
             if (!userId || !phone || !intentText) {
                 return res.status(400).json({
@@ -134,6 +140,15 @@ function registerCallRoutes(app, io) {
             });
 
             console.log("📞 Call initiated:", call.sid);
+
+            // 통화 목적을 transcript 첫 줄로 저장
+            const existing = callHistories.get(call.sid);
+
+            if (!existing || existing.length === 0) {
+                callHistories.set(call.sid, [
+                    { role: "user", content: `[통화 목적] ${intentText}` },
+                ]);
+            }
 
             // 6) DB 저장: Call 생성 (앱 사용자 + 상대방)
             // Call.voiceId에는 실제 ElevenLabs voice_id를 저장(추적용)
