@@ -160,6 +160,8 @@ function registerCallRoutes(app, io) {
                     userId: userId,
                     contactId: contact.id,
                     voiceId: resolvedVoiceId,
+                    purpose: intentText,
+                    summary: null,
                 },
             });
 
@@ -206,6 +208,7 @@ function registerCallRoutes(app, io) {
                     id: c.id,
                     callSid: c.callSid,
                     createdAt: c.createdAt,
+                    purpose: c.purpose,
                     summary: c.summary,
                     transcript: c.transcript,
                     contact: {

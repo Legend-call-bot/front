@@ -139,7 +139,7 @@ function buildCallRowHtml(call) {
 
     const number = call.contact?.phoneNumber || "";
     const label = call.contact?.name || call.contact?.memo || "\u00A0";
-    const summary = call.summary || "\u00A0";
+    const purpose = call.purpose || "통화 목적 없음";
     const time = formatTime(createdAt);
 
     return `
@@ -147,29 +147,33 @@ function buildCallRowHtml(call) {
             <div class="ch-item">
                 ${buildCallIconHtml()}
 
-                <div class="ch-caller">
+                <div class="ch-main">
                     <div class="ch-number">${escapeHtml(number)}</div>
                     <div class="ch-label">${escapeHtml(label)}</div>
+                    <div class="ch-summary">${escapeHtml(purpose)}</div>
                 </div>
-
-                <div class="ch-summary">${escapeHtml(summary)}</div>
 
                 <div class="ch-time">${time}</div>
 
-                <button class="icon-btn icon-btn--call" title="상세" data-action="detail">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                        xmlns="http://www.w3.org/2000/svg" role="img" aria-label="상세">
-                        <path
-                            d="M10 7L15 12L10 17"
-                            stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                        />
-                    </svg>
-                </button>
+                <div class="ch-actions">
+                    <button class="icon-btn icon-btn--call" title="상세" data-action="detail">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg" role="img" aria-label="상세">
+                            <path
+                                d="M10 7L15 12L10 17"
+                                stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            />
+                        </svg>
+                    </button>
+                </div>
             </div>
 
-            <button class="icon-btn icon-btn--add" title="연락처 추가" data-action="add-contact" data-phone="${escapeAttr(
-                number
-            )}">
+            <button
+                class="icon-btn icon-btn--add"
+                title="연락처 추가"
+                data-action="add-contact"
+                data-phone="${escapeAttr(number)}"
+            >
                 <svg width="28" height="28" viewBox="0 0 28 28" fill="none"
                     xmlns="http://www.w3.org/2000/svg" role="img" aria-label="연락처 추가">
                     <path
@@ -240,7 +244,6 @@ function renderCallHistory(calls) {
         (a, b) => b.date - a.date
     );
 
-    // CSS에서 .ch-section + .ch-section 간격 주려면 섹션 래퍼로 감싸기
     root.innerHTML = sortedGroups
         .map((g) => {
             const title = formatSectionTitle(g.date);

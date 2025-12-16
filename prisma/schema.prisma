@@ -39,13 +39,12 @@ model Contact {
 model Call {
   id         String   @id @default(uuid())
   callSid    String   @unique
-
   userId     String
   contactId  String
-
   voiceId    String?
-  transcript String?
+  purpose    String?
   summary    String?
+  transcript String?
   createdAt  DateTime @default(now())
 
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)

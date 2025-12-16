@@ -28,54 +28,48 @@
 .ch-list {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 14px;
 }
 
-/* ✅ JS 렌더링용: 날짜 섹션 단위 래퍼 (추천)
-   call_history.js에서 아래 구조로 만들면 안정적임:
-   <section class="ch-section">
-       <h3 class="ch-section-title">오늘</h3>
-       <div class="ch-list">...</div>
-   </section>
-*/
+/* ✅ 날짜 섹션 단위 래퍼 */
 .ch-section + .ch-section {
     margin-top: 36px;
 }
 
-/* (기존 하드코딩 구조용 규칙은 유지하되, 영향 줄이기 위해 범위 최소화) */
-.ch-list + .ch-section-title {
-    margin-top: 36px;
+/* 통화 내역이 없을 때 */
+.ch-empty {
+    padding: 18px 8px;
+    text-align: center;
+    opacity: 0.7;
 }
 
+/* ====== 한 줄(row) ====== */
 .ch-row {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 16px;
     width: 100%;
 }
 
-/* ====== 각 통화 행 ====== */
-/* [아이콘 | 발신자 | 요약 | 시간 | 전화버튼 ] */
+/* ====== 각 통화 행 (피그마 스타일 핵심) ======
+   [아이콘 | 번호/라벨/요약 | 시간 | 우측 화살표(또는 전화버튼)]
+*/
 .ch-item {
+    flex: 1;
+    min-width: 0;
+
     background: #fff;
     border: 1px solid #e6e6ea;
-    border-radius: 40px;
-    padding: 16px 24px;
-    display: grid;
-    grid-template-columns:
-        minmax(60px, 80px)
-        minmax(220px, 260px)
-        minmax(0, 1fr)
-        minmax(60px, 80px)
-        minmax(30px, 50px);
-    align-items: center;
-    column-gap: 12px;
+    border-radius: 999px;
+    padding: 18px 22px;
 
-    flex: 1;
-    min-width: 0; /* ← 요약 칸에서 말줄임(...) */
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr) 72px 56px;
+    align-items: center;
+    column-gap: 18px;
 }
 
-/* ====== 왼쪽 전화 아이콘 ====== */
+/* ====== 왼쪽 통화 아이콘 영역 ====== */
 .ch-ic {
     width: 40px;
     height: 40px;
@@ -91,59 +85,76 @@
     object-fit: contain;
 }
 
-/* ====== 발신자 정보 ====== */
-.ch-caller {
+/* ====== 메인 텍스트 영역 ======
+   번호/라벨/요약을 한 칸에 묶어서 피그마처럼 보이게
+*/
+.ch-main {
+    min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 2px;
-    padding-left: 0px;
+    gap: 4px;
 }
 
+/* 번호 */
 .ch-number {
     font-size: 20.8px;
     font-weight: 400;
-    word-break: break-all;
+    color: #000;
+    line-height: 1.15;
+    word-break: break-word;
 }
 
+/* 라벨(가게명 등) */
 .ch-label {
     font-size: 20.8px;
-    color: #000000;
+    font-weight: 400;
+    color: #000;
+    line-height: 1.15;
 }
 
-.ch-empty {
-    padding: 18px 8px;
-    text-align: center;
-    opacity: 0.7;
-}
-
-/* ====== 요약 (가운데 열) ====== */
+/* ====== 요약: 2줄 + ... (피그마처럼) ====== */
 .ch-summary {
     font-size: 20.8px;
+    font-weight: 400;
     color: #222;
-    white-space: nowrap;
+    line-height: 1.25;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     overflow: hidden;
-    text-overflow: ellipsis;
-    padding-left: 0px;
+    word-break: break-word;
 }
 
 /* ====== 시간 ====== */
 .ch-time {
-    font-size: 20.8px;
-    color: #222;
     justify-self: end;
-    margin-right: 0; /* ✅ 기존 116px 제거 (그리드로 정렬) */
+    text-align: right;
+    font-size: 20.8px;
+    font-weight: 400;
+    color: #222;
 }
 
-/* ====== 동그란 아이콘 버튼 ====== */
+/* ====== 우측 버튼(> 또는 전화 아이콘 자리) ====== */
+.ch-actions {
+    justify-self: end;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ====== 동그란 아이콘 버튼 (공통) ====== */
 .icon-btn {
-    width: 48px !important;
-    height: 48px !important;
+    width: 52px !important;
+    height: 52px !important;
     padding: 0 !important;
     margin: 0 !important;
+
     background: #fff !important;
     color: inherit !important;
+
     border: 1px solid #d9d9e0 !important;
     border-radius: 999px !important;
+
     display: grid !important;
     place-items: center !important;
     cursor: pointer !important;
@@ -154,7 +165,8 @@
     background: #f7f7fb !important;
 }
 
-.icon-btn img {
+.icon-btn img,
+.icon-btn svg {
     width: 22px;
     height: 22px;
     display: block;
@@ -162,14 +174,39 @@
     pointer-events: none;
 }
 
-/* 전화 버튼 */
+/* row 안의 "상세(>)" 버튼은 테두리 없이 쓰고 싶으면 */
 .icon-btn--call {
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
 }
 
-/* 추가 버튼 살짝 그림자 */
+/* 연락처 추가 버튼은 바깥쪽에 둥글게 (피그마) */
 .icon-btn--add {
     box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+}
+
+/* ====== 반응형 ====== */
+@media (max-width: 768px) {
+    .ch-title {
+        font-size: 32px;
+    }
+
+    .ch-item {
+        padding: 14px 16px;
+        grid-template-columns: 48px minmax(0, 1fr) 64px 48px;
+        column-gap: 12px;
+    }
+
+    .icon-btn {
+        width: 46px !important;
+        height: 46px !important;
+    }
+
+    .ch-number,
+    .ch-label,
+    .ch-summary,
+    .ch-time {
+        font-size: 16px;
+    }
 }
