@@ -136,8 +136,8 @@ function buildCallIconHtml() {
 
 function buildCallRowHtml(call) {
     const createdAt = new Date(call.createdAt);
-
-    const number = call.contact?.phoneNumber || "";
+    const rawNumber = call.contact?.phoneNumber || "";
+    const number = formatPhoneNumber(rawNumber);
     const label = call.contact?.name || call.contact?.memo || "\u00A0";
     const purpose = call.purpose || "통화 목적 없음";
     const time = formatTime(createdAt);
@@ -148,9 +148,11 @@ function buildCallRowHtml(call) {
                 ${buildCallIconHtml()}
 
                 <div class="ch-main">
-                    <div class="ch-number">${escapeHtml(number)}</div>
+                    <div class="ch-line">
+                        <span class="ch-number">${escapeHtml(number)}</span>
+                        <span class="ch-purpose">${escapeHtml(purpose)}</span>
+                    </div>
                     <div class="ch-label">${escapeHtml(label)}</div>
-                    <div class="ch-summary">${escapeHtml(purpose)}</div>
                 </div>
 
                 <div class="ch-time">${time}</div>
@@ -184,6 +186,44 @@ function buildCallRowHtml(call) {
             </button>
         </div>
     `;
+}
+
+function formatPhoneNumber(raw) {
+    const digits = String(raw || "").replace(/\D/g, "");
+    if (!digits) return "";
+
+    // 한국 휴대폰: 010XXXXXXXX
+    if (digits.startsWith("010") && digits.length === 11) {
+        return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
+    }
+
+    // 서울: 02XXXXXXXX or 02XXXXXXX
+    if (
+        digits.startsWith("02") &&
+        (digits.length === 9 || digits.length === 10)
+    ) {
+        if (digits.length === 9) {
+            return `${digits.slice(0, 2)}-${digits.slice(2, 5)}-${digits.slice(
+                5
+            )}`;
+        }
+        return `${digits.slice(0, 2)}-${digits.slice(2, 6)}-${digits.slice(6)}`;
+    }
+
+    // 기타 지역번호: 0XX / 0XXX
+    if (
+        digits.startsWith("0") &&
+        (digits.length === 10 || digits.length === 11)
+    ) {
+        const area3 = digits.slice(0, 3); // 031, 051 ...
+        if (digits.length === 10) {
+            return `${area3}-${digits.slice(3, 6)}-${digits.slice(6)}`;
+        }
+        return `${area3}-${digits.slice(3, 7)}-${digits.slice(7)}`;
+    }
+
+    // 그 외는 숫자만 반환(최소 안전)
+    return digits;
 }
 
 function escapeHtml(str) {
