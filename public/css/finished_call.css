@@ -168,7 +168,7 @@ button {
     border-radius: 20px;
     border: 1px solid #e5e7eb;
     background-color: #f3f4ff;
-    font-size: 14px;
+    font-size: 18px;
     line-height: 1.5;
     color: #111827;
     white-space: pre-line;
@@ -177,6 +177,6 @@ button {
 
 .call-summary-title {
     font-weight: bold;
-    font-size: 15px;
+    font-size: 18px;
     text-align: left;
 }
