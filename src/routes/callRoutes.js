@@ -230,7 +230,7 @@ function registerCallRoutes(app, io) {
         try {
             const { voice } = req.body || {};
 
-            const sampleText = "안녕하세요. 이렇게 들립니다.";
+            const sampleText = "안녕하세요. 콜포비아에 오신걸 환영합니다.";
             const filename = `preview-${uuidv4()}.mp3`;
 
             await synthesizeToFile(sampleText, filename, {
