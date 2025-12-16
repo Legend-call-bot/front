@@ -32,6 +32,7 @@ async function ensureUserId() {
     const res = await fetch(`${SERVER_URL}/api/users/session`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({}),
     });
 
@@ -165,11 +166,3 @@ window.addEventListener("DOMContentLoaded", () => {
     ensureUserId().catch(console.error);
 });
 
-async function requireLogin() {
-    const res = await fetch("/api/me", { credentials: "include" });
-    if (!res.ok) {
-        window.location.replace("/pages/home.html");
-    }
-}
-
-requireLogin();

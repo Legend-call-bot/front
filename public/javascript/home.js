@@ -1,24 +1,34 @@
 // public/javascript/home.js
-async function redirectIfLoggedIn() {
-    try {
-        const res = await fetch("/api/me", { credentials: "include" });
 
-        if (res.ok) {
-            window.location.replace("/pages/call.html");
-            return;
+(function () {
+    const GOOGLE_LOGIN_URL = "/auth/google";
+
+    async function isAuthenticated() {
+        try {
+            const res = await fetch("/api/me", {
+                credentials: "include",
+            });
+            return res.ok;
+        } catch (e) {
+            return false;
         }
-    } catch (e) {
-        // 네트워크 에러면 그냥 홈 유지
     }
-}
 
-document.addEventListener("DOMContentLoaded", () => {
-    const btn = document.getElementById("googleLoginBtn");
-    if (btn) {
+    function bindGoogleLoginButton() {
+        const btn = document.getElementById("googleLoginBtn");
+        if (!btn) return;
+
         btn.addEventListener("click", () => {
-            window.location.href = "/auth/google";
+            window.location.href = GOOGLE_LOGIN_URL;
         });
     }
 
-    redirectIfLoggedIn();
-});
+    document.addEventListener("DOMContentLoaded", async () => {
+        bindGoogleLoginButton();
+
+        const ok = await isAuthenticated();
+        if (ok) {
+            window.location.replace("call.html");
+        }
+    });
+})();
