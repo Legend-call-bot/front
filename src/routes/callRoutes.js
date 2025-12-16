@@ -175,6 +175,53 @@ function registerCallRoutes(app, io) {
         }
     });
 
+    // 통화 기록 조회
+    app.get("/calls/history", async (req, res) => {
+        try {
+            const userId = String(req.query.userId || "");
+            const limit = Math.min(Number(req.query.limit || 50), 200);
+
+            if (!userId) {
+                return res.status(400).json({ error: "userId required" });
+            }
+
+            const calls = await prisma.call.findMany({
+                where: { userId },
+                orderBy: { createdAt: "desc" },
+                take: limit,
+                include: {
+                    contact: {
+                        select: {
+                            id: true,
+                            phoneNumber: true,
+                            name: true,
+                            memo: true,
+                        },
+                    },
+                },
+            });
+
+            return res.json({
+                calls: calls.map((c) => ({
+                    id: c.id,
+                    callSid: c.callSid,
+                    createdAt: c.createdAt,
+                    summary: c.summary,
+                    transcript: c.transcript,
+                    contact: {
+                        id: c.contact.id,
+                        phoneNumber: c.contact.phoneNumber,
+                        name: c.contact.name,
+                        memo: c.contact.memo,
+                    },
+                })),
+            });
+        } catch (err) {
+            console.error(err);
+            return res.status(500).json({ error: err.message });
+        }
+    });
+
     // TTS 프리뷰 (프리셋 키 기반)
     app.post("/tts-preview", async (req, res) => {
         try {

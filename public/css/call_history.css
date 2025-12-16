@@ -31,7 +31,18 @@
     gap: 10px;
 }
 
-/* 하나의 블록(제목+박스)와 다음 블록 사이 간격 늘리기 */
+/* ✅ JS 렌더링용: 날짜 섹션 단위 래퍼 (추천)
+   call_history.js에서 아래 구조로 만들면 안정적임:
+   <section class="ch-section">
+       <h3 class="ch-section-title">오늘</h3>
+       <div class="ch-list">...</div>
+   </section>
+*/
+.ch-section + .ch-section {
+    margin-top: 36px;
+}
+
+/* (기존 하드코딩 구조용 규칙은 유지하되, 영향 줄이기 위해 범위 최소화) */
 .ch-list + .ch-section-title {
     margin-top: 36px;
 }
@@ -55,7 +66,7 @@
         minmax(60px, 80px)
         minmax(220px, 260px)
         minmax(0, 1fr)
-        minmax(30px, 40px)
+        minmax(60px, 80px)
         minmax(30px, 50px);
     align-items: center;
     column-gap: 12px;
@@ -85,16 +96,24 @@
     display: flex;
     flex-direction: column;
     gap: 2px;
-    padding-left: 0px; /* 60 */
+    padding-left: 0px;
 }
+
 .ch-number {
     font-size: 20.8px;
     font-weight: 400;
     word-break: break-all;
 }
+
 .ch-label {
     font-size: 20.8px;
     color: #000000;
+}
+
+.ch-empty {
+    padding: 18px 8px;
+    text-align: center;
+    opacity: 0.7;
 }
 
 /* ====== 요약 (가운데 열) ====== */
@@ -104,7 +123,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    padding-left: 0px; /* 60 */
+    padding-left: 0px;
 }
 
 /* ====== 시간 ====== */
@@ -112,7 +131,7 @@
     font-size: 20.8px;
     color: #222;
     justify-self: end;
-    margin-right: 116px;
+    margin-right: 0; /* ✅ 기존 116px 제거 (그리드로 정렬) */
 }
 
 /* ====== 동그란 아이콘 버튼 ====== */
@@ -130,9 +149,11 @@
     cursor: pointer !important;
     box-sizing: border-box !important;
 }
+
 .icon-btn:hover {
     background: #f7f7fb !important;
 }
+
 .icon-btn img {
     width: 22px;
     height: 22px;
