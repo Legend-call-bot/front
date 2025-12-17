@@ -10,15 +10,14 @@
 
 ## 팀 & 역할
 
-팀명: Legend
+팀명: Legend  
 기간: 2025.09.04 – 2025.12.18
 
-| 역할 | 이름   | 담당 |
-| ---- | ------ | ---- |
-| 팀장 | 하서경 | Backend 개발, Twilio 통화 제어, STT/TTS 연동,  |
-| 팀원 | 김나림 | Backend 개발, LLM 기반 통화 내용 요약,     |
-| 팀원 | 윤예진 | UI/Frontend 개발, DB 설계 및 연동, 로그인/인증 구현 |
-| 팀원 | 임은서 | UI/Frontend 개발, 발표 및 시연,    |
+|        | 하서경 | 김나림 | 윤예진 | 임은서 |
+| ------ | :--: | :--: | :--: | :--: |
+| 프로필 | <img src="./docs/profile/seokyung.png" width="80"/> | <img src="./docs/profile/narim.png" width="80"/> | <img src="./docs/profile/yejin.png" width="80"/> | <img src="./docs/profile/eunseo.png" width="80"/> |
+| 역할 | 팀장 | 팀원 | 팀원 | 팀원 |
+| 담당 | Backend 개발<br/>Twilio 통화 제어<br/>STT/TTS 연동 | Backend 개발<br/>LLM 기반 통화 내용 요약 | UI/Frontend 개발<br/>DB 설계 및 연동<br/>로그인/인증 구현 | UI/Frontend 개발<br/>발표 및 시연 |
 
 ## 기술 스택
 
