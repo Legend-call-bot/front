@@ -10,15 +10,15 @@
 
 ## 팀 & 역할
 
-팀명: Legend  
+팀명: Legend
 기간: 2025.09.04 – 2025.12.18
 
 | 역할 | 이름   | 담당 |
 | ---- | ------ | ---- |
-| 팀장 | 하서경 |      |
-| 팀원 | 김나림 |      |
-| 팀원 | 윤예진 |      |
-| 팀원 | 임은서 |      |
+| 팀장 | 하서경 | Backend 개발, Twilio 통화 제어, STT/TTS 연동,  |
+| 팀원 | 김나림 | Backend 개발, LLM 기반 통화 내용 요약,     |
+| 팀원 | 윤예진 | UI/Frontend 개발, DB 설계 및 연동, 로그인/인증 구현 |
+| 팀원 | 임은서 | UI/Frontend 개발, 발표 및 시연,    |
 
 ## 기술 스택
 
@@ -94,6 +94,8 @@
 </p>
 
 ## 프로젝트 구조
+<details open>
+<summary><strong>전체 디렉터리 구조</strong></summary>
 
 ```bash
 front/                  # Node(Express) 서버 + 정적 프론트(바닐라 JS) 통합 디렉터리
@@ -112,6 +114,54 @@ front/                  # Node(Express) 서버 + 정적 프론트(바닐라 JS) 
 ├─ docker-compose.yml   # 로컬 Postgres 실행
 └─ .env.example         # 환경변수 템플릿
 ```
+</details>
+
+<details open>
+<summary><strong>디렉터리 구조 상세</strong></summary>
+
+```bash
+front/
+    audio/                        # TTS로 생성된 오디오(mp3) 정적 서빙 디렉터리
+    node_modules/                 # 의존성
+    prisma/                       # Prisma schema 및 migration 관리
+    public/                       # 프론트 정적 리소스
+        css/                      # 공통 스타일
+        javascript/               # 브라우저 스크립트
+        pages/                    # HTML 페이지
+    src/                          # 서버 핵심 로직
+        auth/
+            passport.js           # Google OAuth 전략/세션 설정
+        config/
+            env.js                # 환경변수 로딩, 외부 API 클라이언트 초기화
+            voice.js              # 음성 프리셋 매핑/관리
+        db/
+            prisma.js             # Prisma Client 초기화 및 DB 연결
+        routes/
+            authRoutes.js         # 로그인, 콜백, 로그아웃 등
+            callRoutes.js         # 통화 생성, 상태 관리, 미리듣기
+            twilioRoutes.js       # TwiML 응답 및 Twilio 콜백
+            userRoutes.js         # 프로필 조회, 보이스 설정
+        services/
+            ttsService.js         # ElevenLabs TTS 호출, 오디오 파일 생성/저장
+            twilioService.js      # Twilio Call 생성/업데이트/제어
+            summaryService.js     # 통화 요약 (Gemini)
+        sockets/
+            mediaSocket.js        # Twilio Media Stream WebSocket 수신 → STT(Azure) → 추천(Gemini) 파이프라인
+            frontendSocket.js     # 프론트로 실시간 이벤트 Push(자막/추천멘트/통화 상태)
+        utils/
+            audio.js              # 오디오 파일 경로/입출력 유틸
+            mulaw.js              # 오디오 전처리: μ-law → PCM 변환
+    .env
+    .env.example                  # 환경변수 템플릿
+    .gitignore
+    docker-compose.yml            # 로컬 Postgres 실행 설정
+    package-lock.json
+    prisma.config.ts
+    README.md
+    server.js                     # 서버 엔트리: Express 설정 + 라우트/소켓 초기화
+```
+</details>
+
 
 ## 실행 방법
 
