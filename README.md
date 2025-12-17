@@ -15,7 +15,6 @@
 ## 기술 스택
 ### Frontend
 - HTML, CSS, Vanilla JavaScript
-- Web Audio API
 - Socket.IO Client
 
 ### Backend
@@ -48,8 +47,8 @@
 - μ-law 음성을 PCM으로 변환 후 Azure STT로 실시간 음성 인식
 - 인식 결과를 자막 형태로 프론트에 실시간 전달
 
-### 대화 지원 (추천 멘트)
-- STT 결과를 기반으로 Gemini가 상황별 추천 멘트 생성
+### 대화 지원 (추천 답변)
+- STT 결과를 기반으로 Gemini가 상황별 추천 답변 생성
 - 추천 멘트를 프론트에 실시간 제공하여 전화 응대 보조
 
 ### TTS 생성 및 통화 중 재생
@@ -150,7 +149,6 @@ SESSION_SECRET=
 ```
 
 ### 3️⃣ 서버 실행
-
 ```bash
 npm install
 docker-compose up -d   # Postgres 실행
@@ -165,12 +163,31 @@ ngrok http 3003
 ```
 
 ## 주요 엔드포인트
+| 구분 | Method | Path | 설명 |
+| --- | --- | --- | --- |
+| Client | POST | `/calls` | 전화 발신 요청 (시작 멘트 생성 후 Twilio 발신) |
+| Client | GET | `/calls/history` | 통화 기록 조회 |
+| Client | POST | `/tts-preview` | TTS 미리듣기 |
+| Twilio | POST | `/call-status` | 통화 상태 콜백 |
+| Twilio | ALL | `/twilio/answer` | TwiML 응답 (스트림 시작 + 시작 멘트 재생) |
+| Twilio | ALL | `/twilio/hold` | TwiML 응답 (대기 유지 + 스트림 유지) |
 
--   POST /calls : 전화 발신 요청
--   POST /call-status : Twilio 통화 상태 콜백
--   GET /tts-preview : TTS 미리듣기
--   POST /twilio/answer : Twilio 응답(TwiML)
--   POST /twilio/hold : 대기/재생 제어
 
 ## 트러블슈팅
-TODO: 주요 이슈 및 해결 과정 정리 예정
+
+- **Google OAuth 로그인 후 로그인 전 화면으로 되돌아가는 이슈**
+  - 세션 기반 인증과 프론트 상태(`localStorage userId`)가 불일치하여 발생
+  - 로그인 성공 후 세션 사용자 기준으로 상태를 재동기화하여 해결  
+    (`passport serialize/deserialize` + `/api/me` 조회)
+
+- **사용자별 보이스 설정 구조 변경**
+  - User 테이블의 선호 보이스 필드를 제거하고 보이스 설정을 `UserVoiceSetting` 테이블로 분리
+  - 보이스 선택 우선순위를 프리셋 → 사용자 설정(DB) → 기본값 순으로 정리
+
+- **Prisma 스키마 변경 후 실행 오류**
+  - 스키마 변경 후 Prisma Client 반영이 누락되어 런타임 오류 발생
+  - 브라우저 콘솔에서 `localStorage userId`를 삭제 후 새로고침하여 복구
+    ```js
+    localStorage.removeItem("userId");
+    location.reload();
+    ```
