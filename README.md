@@ -1,11 +1,16 @@
 # CallBa
 콜포비아 사용자를 위한 **전화 발신 보조 웹 서비스**  
 
+## 프로젝트 개요
+전화 통화에 대한 불안으로 발신이 부담스러운 사용자를 위해  
+사용자 입력 기반의 통화 목적을 음성(TTS)으로 대신 전달하고,  
+실시간 자막 및 상황별 응답 추천으로 통화 전반을 지원합니다.
+
+## 팀 & 역할
 팀명: Legend  
 기간: 2025.09.04 – 2025.12.18  
 
-## 팀원
-| 역할 | 이름   | 담당 |
+| 역할 | 이름 | 담당 |
 | ---- | ------ | ---- |
 | 팀장 | 하서경 |      |
 | 팀원 | 김나림 |      |
@@ -18,8 +23,7 @@
 - Socket.IO Client
 
 ### Backend
-- Node.js
-- Express
+- Node.js / Express
 - WebSocket (Twilio Media Stream)
 - Socket.IO
 
@@ -37,25 +41,25 @@
 
 ## 핵심 기능
 
-### 전화 발신 및 통화 제어
+### 전화 발신 및 통화 흐름 제어
 - 웹에서 발신 요청 시 Twilio Call API로 전화 연결
 - TwiML을 통해 통화 시작, 대기, 음성 재생 등 통화 흐름 제어
 - 통화 상태 콜백을 수신해 실시간 상태 동기화
 
-### 실시간 음성 인식 및 자막
+### 실시간 음성 인식 및 자막 제공
 - Twilio Media Stream을 WebSocket으로 수신
 - μ-law 음성을 PCM으로 변환 후 Azure STT로 실시간 음성 인식
 - 인식 결과를 자막 형태로 프론트에 실시간 전달
 
-### 대화 지원 (추천 답변)
+### AI 기반 대화 지원
 - STT 결과를 기반으로 Gemini가 상황별 추천 답변 생성
 - 추천 멘트를 프론트에 실시간 제공하여 전화 응대 보조
 
-### TTS 생성 및 통화 중 재생
+### TTS 생성 및 재생
 - 추천 멘트 또는 사용자 입력 문장을 ElevenLabs TTS로 음성 생성
 - 생성된 음성을 통화 중 실시간 재생하거나 웹에서 미리듣기 지원
 
-### 통화 요약 및 기록
+### 통화 요약 및 기록 관리
 - 통화 종료 시 전체 대화를 Gemini로 요약
 - 요약 및 대화 기록을 DB에 저장하고 조회 가능
 
@@ -68,11 +72,11 @@
 5. 선택된 멘트를 TTS로 생성해 통화 중 재생
 6. 통화 종료 후 요약 생성 및 저장
 
-> 파이프라인 요약  
+> 파이프라인 요약:  
 > Twilio Media Stream → WebSocket → Azure STT → Gemini → Socket.IO → (ElevenLabs TTS)
 
-## 폴더 구조
-```text
+## 프로젝트 구조
+```bash
 front/                  # Node(Express) 서버 + 정적 프론트(바닐라 JS) 통합 디렉터리
 ├─ public/              # 프론트 정적 리소스(HTML/CSS/JS)
 ├─ src/                 # 서버 핵심 로직
@@ -101,7 +105,13 @@ front/                  # Node(Express) 서버 + 정적 프론트(바닐라 JS) 
 프로젝트 루트(`front/`)에 `.env` 파일을 생성하고 아래 값을 설정합니다.  
 필수 값은 `.env.example` 파일을 참고하세요.
 
-```text
+
+<details>
+<summary><b>환경변수 목록 보기</b></summary>
+
+<br />
+
+```bash
 # Server
 PORT=3003
 PUBLIC_HOST=
@@ -147,6 +157,8 @@ GOOGLE_CLIENT_SECRET=
 GOOGLE_CALLBACK_URL=
 SESSION_SECRET=
 ```
+</details>
+
 
 ### 3️⃣ 서버 실행
 ```bash
@@ -171,6 +183,75 @@ ngrok http 3003
 | Twilio | POST | `/call-status` | 통화 상태 콜백 |
 | Twilio | ALL | `/twilio/answer` | TwiML 응답 (스트림 시작 + 시작 멘트 재생) |
 | Twilio | ALL | `/twilio/hold` | TwiML 응답 (대기 유지 + 스트림 유지) |
+
+
+## 기술적 의사결정
+
+<details>
+<summary><b>🎧 Media Stream 기반 실시간 음성 처리</b></summary>
+
+<br />
+
+통화 음성을 WebSocket으로 스트리밍 처리해 **STT 지연을 최소화**했습니다.
+
+- HTTP 업로드/폴링 방식 대신 **Twilio Media Streams(WebSocket)** 구조 선택
+- 통화 음성을 프레임 단위로 지속 수신해 실시간 처리
+
+**구현 근거**
+- TwiML `<Start><Stream />`으로 통화 오디오를 WebSocket으로 스트리밍
+- 서버는 `httpServer upgrade`를 통해 WS 연결을 수립
+- `start / media / stop` 이벤트 단위로 오디오 프레임 처리
+
+**처리 파이프라인**
+- μ-law 오디오를 PCM으로 변환
+- 변환된 오디오를 Azure STT 스트림 입력으로 즉시 전달
+
+</details>
+
+
+<details>
+<summary><b>💬 STT 결과 실시간 Push 구조</b></summary>
+
+<br />
+
+STT 인식 결과를 즉시 프론트로 전달해 **사용자 응답 대기시간을 최소화**했습니다.
+
+- STT 결과를 polling이 아닌 **push 방식**으로 전달
+- 통화 흐름이 끊기지 않도록 실시간 자막 제공
+
+**구현 근거**
+- Azure Speech SDK의 스트리밍 인식 방식 사용
+- STT 인식 완료 시 Socket 이벤트로 프론트에 즉시 전달
+
+**중복·노이즈 제어**
+- 동일 발화의 반복 인식 문제 방지
+- 최근 인식 텍스트 + 시간 기준 중복 필터링 적용
+
+**프론트 연계 흐름**
+- 프론트는 `callSid` 기준 room에 연결
+- STT 결과 수신 즉시 자막 표시 및 응답 추천 트리거
+
+</details>
+
+
+<details>
+<summary><b>🧩 서비스 단위 분리 설계 (routes ↔ services)</b></summary>
+
+<br />
+
+routes는 I/O(HTTP·소켓 이벤트)만 담당하고,  
+services에 비즈니스 로직을 집중시켜 **벤더 교체 및 기능 확장에 유리한 구조**로 설계했습니다.
+
+- **역할 분리**: routes는 요청/응답 처리, services는 핵심 로직 담당
+- **외부 의존 격리**: Twilio / ElevenLabs / Gemini 호출을 services로 캡슐화
+- **확장 용이성**: 벤더 변경 시 services만 수정하도록 설계
+
+**구현 근거 (핵심 파일)**
+- TTS: `src/services/ttsService.js` (`synthesizeToFile`)
+- 통화 제어: `src/services/twilioService.js` (`playToCall`)
+- 요약: `src/services/summaryService.js` (`summarizeCall`)
+
+</details>
 
 
 ## 트러블슈팅
